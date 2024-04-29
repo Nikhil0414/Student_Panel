@@ -47,3 +47,13 @@ class Mentorship(models.Model):
 
     def __str__(self):
         return f"Mentorship for {self.user.username}"
+    
+class QuestionPaper(models.Model):
+    title = models.CharField(max_length=200)
+    year = models.IntegerField()
+    subject = models.CharField(max_length=100)
+    file = models.FileField(upload_to='question_papers/')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
