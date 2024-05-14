@@ -127,6 +127,11 @@ def course_catalog(request):
     return render(request, 'course_catalog.html', {'courses': courses})
 
 
+def career_roadmap(request):
+    courses = Course.objects.all()
+    return render(request, 'career_roadmap.html', {'courses': courses})
+
+
 def view_course_details(request, course_id):
     course = Course.objects.get(id=course_id)
     return render(request, 'view_course_details.html', {'course': course})

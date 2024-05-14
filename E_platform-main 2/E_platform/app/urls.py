@@ -9,6 +9,8 @@ urlpatterns = [
     path('logout/', logout_user, name='logout'),
 
     path('course_catalog', course_catalog, name='course_catalog'),
+    path('career_roadmap', career_roadmap, name='career_roadmap'),
+
     path('mentorship_page/', homepage, name='mentorship_page'),
     path('paymenthandler/', paymenthandler, name='paymenthandler'),
     path('course/<int:course_id>/', view_course_details, name='view_course_details'),
