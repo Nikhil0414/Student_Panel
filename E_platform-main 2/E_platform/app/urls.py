@@ -30,4 +30,13 @@ urlpatterns = [
     path('like_comment/<int:comment_id>/', like_comment, name='like_comment'),
     path('dislike_comment/<int:comment_id>/', dislike_comment, name='dislike_comment'),
 
+    path('add-to-cart/<int:course_id>/', add_to_cart, name='add_to_cart'),
+    path('view-cart/', view_cart, name='view_cart'),
+    path('remove-from-cart/<int:course_id>/', remove_from_cart, name='remove_from_cart'),
+
+    path('add_to_wishlist/<int:course_id>/', add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/', wishlist, name='wishlist'),
+    path('wishlist/remove/<int:course_id>/', remove_from_wishlist, name='remove_from_wishlist'),
+
+    path('support/', support, name='support'),
 ]

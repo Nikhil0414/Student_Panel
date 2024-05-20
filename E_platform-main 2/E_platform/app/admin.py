@@ -13,3 +13,7 @@ admin.site.register(Comment)
 
 admin.site.register(Week)
 admin.site.register(Topic)
+
+admin.site.register(Ticket)
+
+

@@ -58,6 +58,12 @@
                 <a class="nav-link" href="{% url 'mentorship_page' %}">Personal Mentorship</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="{% url 'view_cart' %}">Cart</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'wishlist' %}">Wishlist</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{% url 'logout' %}">Logout</a>
             </li>
         </ul>
@@ -74,33 +80,24 @@
             <br>
 
             <!-- Additional course details -->
-            <h4>Course Details</h4>
-            <ul>
-                <li><strong>Created by:</strong> Which Academy</li>
-                <li><strong>Last updated on:</strong> 00/00/0000</li>
-                <li><strong>Language:</strong> English</li>
-            </ul>
-            <br>
             <h4>What you'll learn</h4>
-            <ul>
-                <li>Extensive, informative, and interesting video lectures</li>
-                <li>Complete code demonstrated in lectures</li>
-                <li>Lab exercises</li>
-                <li>Lab solution sets</li>
-                <li>All PowerPoint demonstrations used in the course</li>
-                <li>Instructor contact email for questions and clarifications</li>
-                <li>Coverage of all important primary JavaScript concepts</li>
-            </ul>
+            <p>{{ course.what_you_will_learn }}</p>
+
             <br>
             <h4>This course includes:</h4>
-            <ul>
-                <li>7.5 hours on-demand video</li>
-                <li>6 coding exercises</li>
-                <li>1 article</li>
-                <li>25 downloadable resources</li>
-                <li>Access on mobile and TV</li>
-                <li>Certificate of completion</li>
-            </ul>
+            <p>{{ course.this_course_includes }}</p>
+            <br>
+
+            <h4>Course Content</h4>
+            <br>
+            <h4>Requirement</h4>
+            <br>
+            <h4>Instructor</h4>
+            <br>
+            <h4>Ratings</h4>
+
+
+
 
         </div>
         <div class="col-md-6">
@@ -125,9 +122,16 @@
                 <button type="submit" class="btn btn-primary mt-4">Enroll Now</button>
                 </form>
 
-                <button class="btn btn-primary mt-4">Add to Cart</button>
+                <!-- Add to Cart button -->
+                <form method="post" action="{% url 'add_to_cart' course.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary mt-4">Add to Cart</button>
+                </form>
 
-                <button class="btn btn-primary mt-4">Like</button>
+                <form method="post" action="{% url 'add_to_wishlist' course.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary mt-4">Add to Wishlist</button>
+                </form>
 
                 </div>
                 <br>
@@ -139,10 +143,5 @@
     </div>
 </div>
 
-
-<!-- Bootstrap JS (Optional - Only if needed for JavaScript functionality) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

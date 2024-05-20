@@ -342,3 +342,71 @@ def dislike_comment(request, comment_id):
     return JsonResponse({'dislikes': comment.dislikes})
 
 
+
+
+@login_required
+def view_cart(request):
+    cart_courses = request.user.student.cart.all()
+    return render(request, 'view_cart.html', {'cart_courses': cart_courses})
+
+
+@login_required
+def add_to_cart(request, course_id):
+    course = Course.objects.get(id=course_id)
+    # Check if the course is already in the user's cart
+    if course in request.user.student.cart.all():
+        messages.info(request, "This course is already in your cart.")
+    else:
+        request.user.student.cart.add(course)
+        messages.success(request, "Course added to cart successfully.")
+    return redirect('view_course_details', course_id=course_id)
+
+
+def remove_from_cart(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    if request.method == 'POST':
+        if request.user.is_authenticated:  # Ensure the user is authenticated
+            student = request.user.student
+            if student.cart.filter(pk=course_id).exists():
+                student.cart.remove(course)
+                return redirect('view_cart')  # Redirect to the cart page after removal
+    return redirect('view_cart')
+
+def add_to_wishlist(request, course_id):
+    if request.method == 'POST':
+        course = Course.objects.get(id=course_id)
+        student = request.user.student
+        student.wishlist.add(course)  # Assuming 'wishlist' is the name of the ManyToManyField in the Student model
+        return redirect('view_course_details', course_id=course_id)
+    else:
+        return redirect('course_catalog')  # Redirect to course catalog if not a POST request
+
+def wishlist(request):
+    student = request.user.student
+    wishlist_courses = student.wishlist.all()
+    return render(request, 'wishlist.html', {'wishlist_courses': wishlist_courses})
+
+
+def remove_from_wishlist(request, course_id):
+    student = request.user.student
+    course = student.wishlist.get(id=course_id)
+    student.wishlist.remove(course)
+    return redirect('wishlist')
+
+
+def support(request):
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        description = request.POST.get('description')
+        attachment = request.FILES.get('attachment')
+
+        Ticket.objects.create(
+            user=request.user,
+            reason=reason,
+            description=description,
+            attachment=attachment
+        )
+        return redirect('support')
+
+    tickets = Ticket.objects.filter(user=request.user).order_by('-timestamp')
+    return render(request, 'support.html', {'tickets': tickets})

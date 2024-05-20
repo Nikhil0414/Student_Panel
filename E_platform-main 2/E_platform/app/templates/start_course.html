@@ -9,8 +9,7 @@
     <style>
         .video-container {
             position: relative;
-            width: 80%; /* Adjust the width of the video container */
-            margin: 0 auto; /* Center the container horizontally */
+            width: 100%; /* Adjust the width of the video container */
             padding-top: 56.25%; /* 16:9 Aspect Ratio (responsive) */
             overflow: hidden;
         }
@@ -22,11 +21,45 @@
             width: 100%;
             height: 100%;
         }
+
+        .video-container {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%; /* 16:9 aspect ratio (height: 56.25% of width) */
+    }
+
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+
+
+        .sidebar {
+            position: fixed;
+            top: 100px;
+            left: 0;
+            height: 100%;
+            overflow-y: auto;
+            z-index: 1030;
+        }
+
+        .main-content {
+            margin-left: 450px; /* Adjust the width of the sidebar */
+        }
+
+        .hidden {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
-<!-- Header -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<!-- Sidebar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <a class="navbar-brand" href="#">E-Learning</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -46,59 +79,146 @@
                 <a class="nav-link" href="{% url 'mentorship_page' %}">Personal Mentorship</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="{% url 'support' %}">Support</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{% url 'logout' %}">Logout</a>
             </li>
         </ul>
     </div>
 </nav>
 
-<div class="container mt-5">
-    <h2>{{ course.title }}</h2>
-    <p>{{ course.description }}</p>
-    <p>{{ course.roadmap }}</p>
+<!-- Content -->
+<div class="container-fluid" style="margin-top: 70px;">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 sidebar">
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action" data-section="course-material">Course Material</a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="grades">Grades</a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="notes">Notes</a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="discussions">Discussion Forum</a>
+                 <a href="#" class="list-group-item list-group-item-action" data-section="messages">Messages </a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="resources">Resources</a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="course_info">Course Info</a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="career_guidance">Career Guidance</a>
+                 <a href="#" class="list-group-item list-group-item-action" data-section="qp">Question Paper</a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="1_on_1">1-on-1 Mentorship</a>
 
-    <!-- Course Video -->
-    {% if course.course_video %}
-    <div class="video-container mt-4">
-        <video controls>
-            <source src="{{ course.course_video.url }}" type="{{ course.course_video.content_type }}">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-    {% endif %}
-
-    <!-- Weeks and Topics -->
-    {% for week in course.weeks.all %}
-    <div class="card mt-4">
-        <div class="card-header">
-            <h3>Week {{ week.number }}: {{ week.title }}</h3>
+            </div>
         </div>
-        <div class="card-body">
-            {% for topic in week.topics.all %}
-            <div class="card mt-3">
+        <!-- Main Content -->
+        <div class="col-md-9 main-content">
+            <!-- Course Material Section -->
+            <div id="course-material" class="content-section">
+                <h2>{{ course.title }}</h2>
+                <p>{{ course.description }}</p>
+                <p>{{ course.roadmap }}</p>
+                <!-- Weeks and Topics -->
+            {% for week in course.weeks.all %}
+            <div class="card mt-4">
                 <div class="card-header">
-                    <h5>Topic: {{ topic.title }}</h5>
+                    <h3>Week {{ week.number }}: {{ week.title }}</h3>
                 </div>
                 <div class="card-body">
-                    {% if topic.video %}
-                    <div class="video-container">
-                        <video controls>
-                            <source src="{{ topic.video.url }}" type="{{ topic.video.content_type }}">
-                            Your browser does not support the video tag.
-                        </video>
+                    {% for topic in week.topics.all %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5>Topic: {{ topic.title }}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if topic.video_file %}
+                            <div class="video-container">
+                                <video controls>
+                                    <source src="{{ topic.video_file.url }}" type="{{ topic.video_file.content_type }}">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            {% elif topic.video_link %}
+                            <div class="video-container">
+                                <iframe width="1000" height="650" src="{{ topic.video_link }}" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% endif %}
+                    {% endfor %}
                 </div>
             </div>
             {% endfor %}
+
+            </div>
+            <!-- Grades Section -->
+            <div id="grades" class="content-section hidden">
+                <h2>Grades Section</h2>
+                <!-- Include your grades content here -->
+            </div>
+
+            <div id="notes" class="content-section hidden">
+                <h2>Notes</h2>
+                <!-- Include your discussions content here -->
+            </div>
+
+            <!-- Discussions Section -->
+            <div id="discussions" class="content-section hidden">
+                <h2>Discussion Forum</h2>
+                <!-- Include your discussions content here -->
+            </div>
+
+            <div id="messages" class="content-section hidden">
+                <h2>Messages</h2>
+                <!-- Include your discussions content here -->
+            </div>
+
+            <div id="resources" class="content-section hidden">
+                <h2>Resources</h2>
+                <!-- Include your discussions content here -->
+            </div>
+
+            <div id="course_info" class="content-section hidden">
+                <h2>Course Info</h2>
+                <br>
+                <h3>{{ course.title }}</h3>
+            <p>{{ course.description }}</p>
+            <br>
+            <h4>What you'll learn</h4>
+            <p>{{ course.what_you_will_learn }}</p>
+
+            <br>
+            <h4>This course includes:</h4>
+            <p>{{ course.this_course_includes }}</p>
+            </div>
+
+            <div id="career_guidance" class="content-section hidden">
+                <h2>Career Guidance</h2>
+                <!-- Include your discussions content here -->
+            </div>
+
+            <div id="qp" class="content-section hidden">
+                <h2>Question Paper</h2>
+                <!-- Include your discussions content here -->
+            </div>
+
+            <div id="1_on_1" class="content-section hidden">
+                <h2>1-on-1 Mentorship</h2>
+            </div>
+
         </div>
     </div>
-    {% endfor %}
 </div>
 
 <!-- Bootstrap JS (Optional - Only if needed for JavaScript functionality) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function(){
+        // Show the corresponding section when a sidebar link is clicked
+        $(".list-group-item").click(function(){
+            var section = $(this).data('section');
+            $(".content-section").addClass('hidden');
+            $("#" + section).removeClass('hidden');
+        });
+    });
+</script>
 </body>
 </html>
