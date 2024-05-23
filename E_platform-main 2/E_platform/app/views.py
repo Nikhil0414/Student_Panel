@@ -410,3 +410,158 @@ def support(request):
 
     tickets = Ticket.objects.filter(user=request.user).order_by('-timestamp')
     return render(request, 'support.html', {'tickets': tickets})
+
+
+@login_required
+def update_profile(request):
+    # Ensure the user has a profile
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('update_profile')  # Redirect to update profile page after successful update
+    else:
+        form = ProfileUpdateForm(instance=profile)
+    return render(request, 'update_profile.html', {'form': form})
+
+
+@login_required
+def account_security(request):
+    if request.method == 'POST':
+        email_form = EmailChangeForm(request.POST, instance=request.user)
+        password_form = PasswordChangeForm(request.user, request.POST)
+        if email_form.is_valid():
+            email_form.save()
+            return redirect('update_profile')
+        elif password_form.is_valid():
+            password_form.save()
+            # Update the session to prevent users from being logged out after changing password
+            update_session_auth_hash(request, request.user)
+            # Redirect to update profile page after successful update
+            return redirect('update_profile')
+    else:
+        email_form = EmailChangeForm(instance=request.user)
+        password_form = PasswordChangeForm(request.user)
+    return render(request, 'account_security.html', {'email_form': email_form, 'password_form': password_form})
+
+
+@login_required
+def educational_details(request):
+    return render(request, 'educational_details.html')
+
+
+@login_required
+def add_work_experience(request):
+    work_experience_form = WorkExperienceForm()
+    if request.method == 'POST':
+        work_experience_form = WorkExperienceForm(request.POST)
+        if work_experience_form.is_valid():
+            work_experience = work_experience_form.save(commit=False)
+            work_experience.user = request.user
+            work_experience.save()
+            messages.success(request, 'Work experience has been added successfully.')
+            return redirect('educational_details')
+    return render(request, 'add_work_experience.html', {'work_experience_form': work_experience_form})
+
+
+@login_required
+def add_education(request):
+    education_form = EducationForm()
+    if request.method == 'POST':
+        education_form = EducationForm(request.POST)
+        if education_form.is_valid():
+            education = education_form.save(commit=False)
+            education.user = request.user
+            education.save()
+            return redirect('educational_details')
+    return render(request, 'add_education.html', {'education_form': education_form})
+
+
+@login_required
+def add_project(request):
+    project_form = ProjectForm()
+    if request.method == 'POST':
+        project_form = ProjectForm(request.POST)
+        if project_form.is_valid():
+            project = project_form.save(commit=False)
+            project.user = request.user
+            project.save()
+            return redirect('educational_details')
+    return render(request, 'add_project.html', {'project_form': project_form})
+
+
+@login_required
+def privacy_settings(request):
+    try:
+        privacy_settings = request.user.privacysettings
+    except PrivacySettings.DoesNotExist:
+        privacy_settings = PrivacySettings(user=request.user)
+
+    if request.method == 'POST':
+        form = PrivacySettingsForm(request.POST, instance=privacy_settings)
+        if form.is_valid():
+            form.save()
+            return redirect('update_profile')
+    else:
+        form = PrivacySettingsForm(instance=privacy_settings)
+
+    return render(request, 'privacy_settings.html', {'form': form})
+
+
+@login_required
+def notification_settings(request):
+    try:
+        settings = NotificationSettings.objects.get(user=request.user)
+    except NotificationSettings.DoesNotExist:
+        settings = NotificationSettings(user=request.user)
+
+    if request.method == 'POST':
+        form = NotificationSettingsForm(request.POST, instance=settings)
+        if form.is_valid():
+            form.save()
+            return redirect('update_profile')
+    else:
+        form = NotificationSettingsForm(instance=settings)
+
+    return render(request, 'notification_settings.html', {'form': form})
+
+
+@login_required
+def referrals(request):
+    if request.method == 'POST':
+        referral_form = ReferralForm(request.POST)
+        if referral_form.is_valid():
+            referral = referral_form.save(commit=False)
+            referral.user = request.user
+            referral.save()
+            return redirect('referrals')
+    else:
+        referral_form = ReferralForm()
+    return render(request, 'referrals.html', {'referral_form': referral_form})
+
+
+@login_required
+def payment_history(request):
+    payments = PaymentHistory.objects.filter(user=request.user)
+    return render(request, 'payment_history.html', {'payments': payments})
+
+
+@csrf_exempt
+@login_required
+def add_note(request, course_id):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        course = get_object_or_404(Course, id=course_id)
+        student = get_object_or_404(Student, user=request.user)
+        note = Note.objects.create(course=course, student=student, content=content)
+        return JsonResponse({'status': 'success', 'note': {'content': note.content, 'created_at': note.created_at}})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+def get_notes(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    student = get_object_or_404(Student, user=request.user)
+    notes = Note.objects.filter(course=course, student=student).values('content', 'created_at')
+    return JsonResponse({'status': 'success', 'notes': list(notes)})

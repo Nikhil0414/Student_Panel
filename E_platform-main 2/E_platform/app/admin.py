@@ -16,4 +16,19 @@ admin.site.register(Topic)
 
 admin.site.register(Ticket)
 
+admin.site.register(Profile)
+
+admin.site.register(WorkExperience)
+admin.site.register(Education)
+admin.site.register(Project)
+admin.site.register(NotificationSettings)
+admin.site.register(PrivacySettings)
+admin.site.register(Referral)
+admin.site.register(PaymentHistory)
+
+admin.site.register(Note)
+
+
+
+
 

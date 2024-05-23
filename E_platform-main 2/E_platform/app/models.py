@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
+from django.conf import settings
+from django.utils import timezone
 
 
 class CustomeUser(AbstractUser):
@@ -161,3 +164,91 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"Ticket #{self.id} - {self.user.email}"
+
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    bio = models.TextField(blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics', blank=True)
+    mobile_number = models.CharField(max_length=15, blank=True)
+    language = models.CharField(max_length=50, blank=True)
+    linkedin_profile = models.URLField(blank=True)
+    twitter_profile = models.URLField(blank=True)
+    facebook_profile = models.URLField(blank=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
+
+class WorkExperience(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    company_name = models.CharField(max_length=255)
+    position = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    description = models.TextField()
+
+class Education(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    institution_name = models.CharField(max_length=255)
+    degree = models.CharField(max_length=255)
+    field_of_study = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+
+class Project(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
+
+class PrivacySettings(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    show_profile_to_logged_in_users = models.BooleanField(default=True)
+    show_courses_on_profile = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Privacy Settings"
+
+class NotificationSettings(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    promotion = models.BooleanField(default=True)
+    helpful_resources = models.BooleanField(default=True)
+    no_promotional_email = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username}'s Notification Settings"
+
+class Referral(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    friend_email = models.EmailField()
+    date_referred = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} referred {self.friend_email}"
+
+
+
+class PaymentHistory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    course_title = models.CharField(max_length=255)
+    date = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_type = models.CharField(max_length=50)
+    receipt_invoice = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.course_title} - {self.date}"
+
+
+class Note(models.Model):
+    course = models.ForeignKey(Course, related_name='notes', on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, related_name='notes', on_delete=models.CASCADE, null=True, blank=True)
+    content = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Note by {self.student.user.email} on {self.course.title}"

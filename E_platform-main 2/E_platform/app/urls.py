@@ -39,4 +39,20 @@ urlpatterns = [
     path('wishlist/remove/<int:course_id>/', remove_from_wishlist, name='remove_from_wishlist'),
 
     path('support/', support, name='support'),
+
+
+    path('update_profile/', update_profile, name='update_profile'),
+    path('account_security/', account_security, name='account_security'),
+    path('educational_details/', educational_details, name='educational_details'),
+    path('add_work_experience/', add_work_experience, name='add_work_experience'),
+    path('add_education/', add_education, name='add_education'),
+    path('add_project/', add_project, name='add_project'),
+    path('privacy_settings/', privacy_settings, name='privacy_settings'),
+    path('notification_settings/', notification_settings, name='notification_settings'),
+    path('referrals/', referrals, name='referrals'),
+    path('payment_history/', payment_history, name='payment_history'),
+
+
+    path('courses/<int:course_id>/add_note/', add_note, name='add_note'),
+    path('courses/<int:course_id>/get_notes/', get_notes, name='get_notes'),
 ]
