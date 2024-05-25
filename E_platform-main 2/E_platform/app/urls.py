@@ -55,4 +55,9 @@ urlpatterns = [
 
     path('courses/<int:course_id>/add_note/', add_note, name='add_note'),
     path('courses/<int:course_id>/get_notes/', get_notes, name='get_notes'),
+    path('courses/<int:course_id>/messages/', get_messages, name='course_messages'),
+    path('courses/<int:course_id>/messages/json/', get_course_messages_json, name='get_course_messages_json'),
+    path('courses/<int:course_id>/career_guidance/json/', get_career_guidance_json, name='get_career_guidance_json'),
+    path('courses/<int:course_id>/resources/json/', get_course_resources_json, name='get_course_resources_json'),
+
 ]

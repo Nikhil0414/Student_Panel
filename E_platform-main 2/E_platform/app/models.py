@@ -58,6 +58,7 @@ class Student(models.Model):
     def __str__(self) -> str:
         return self.Full_Name
 
+
 class Week(models.Model):
     course = models.ForeignKey(Course, related_name='weeks', on_delete=models.CASCADE)
     number = models.PositiveIntegerField()
@@ -87,9 +88,6 @@ class Topic(models.Model):
             return self.video_link
         else:
             return None
-
-
-
 
 
 class Enrollment(models.Model):
@@ -166,7 +164,6 @@ class Ticket(models.Model):
         return f"Ticket #{self.id} - {self.user.email}"
 
 
-
 class Profile(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
@@ -189,6 +186,7 @@ class WorkExperience(models.Model):
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField()
 
+
 class Education(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     institution_name = models.CharField(max_length=255)
@@ -196,6 +194,7 @@ class Education(models.Model):
     field_of_study = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
+
 
 class Project(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -205,6 +204,7 @@ class Project(models.Model):
     end_date = models.DateField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
+
 class PrivacySettings(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     show_profile_to_logged_in_users = models.BooleanField(default=True)
@@ -212,6 +212,7 @@ class PrivacySettings(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Privacy Settings"
+
 
 class NotificationSettings(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -222,6 +223,7 @@ class NotificationSettings(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Notification Settings"
 
+
 class Referral(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     friend_email = models.EmailField()
@@ -229,7 +231,6 @@ class Referral(models.Model):
 
     def __str__(self):
         return f"{self.user.username} referred {self.friend_email}"
-
 
 
 class PaymentHistory(models.Model):
@@ -252,3 +253,30 @@ class Note(models.Model):
 
     def __str__(self):
         return f"Note by {self.student.user.email} on {self.course.title}"
+
+
+class Message(models.Model):
+    course = models.ForeignKey(Course, related_name='messages', on_delete=models.CASCADE, null=True, blank=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return f"Message for {self.course.title}"
+
+
+class CareerGuidanceMessage(models.Model):
+    course = models.ForeignKey(Course, related_name='career_guidance_messages', on_delete=models.CASCADE, null=True, blank=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return f"Career Guidance for {self.course.title}"
+
+
+# models.py
+
+class Resource(models.Model):
+    week = models.ForeignKey(Week, related_name='resources', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    pdf_file = models.FileField(upload_to='staticfiles/week_resources/', null=True, blank=True)
+
+    def __str__(self):
+        return f"Resource '{self.title}' for Week {self.week.number}"

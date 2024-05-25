@@ -130,22 +130,64 @@
                 <h2>Discussion Forum</h2>
                 <!-- Include your discussions content here -->
             </div>
+
+
+
+            <!-- Messages Section -->
             <div id="messages" class="content-section hidden">
                 <h2>Messages</h2>
-                <!-- Include your discussions content here -->
+                <ul id="messages-list">
+                    <!-- Messages will be appended here by JavaScript -->
+                </ul>
+                <p id="no-messages" class="hidden">No messages available.</p>
             </div>
+
+
+
             <div id="resources" class="content-section hidden">
-                <h2>Resources</h2>
-                <!-- Include your discussions content here -->
+            <h2>Resources</h2>
+            {% for week in weeks %}
+                <h3>{{ week.title }}</h3>
+                {% for resource in week.resources.all %}
+                    <p>{{ resource.title }}</p>
+                    {% if resource.pdf_file %}
+                        <a href="{{ resource.pdf_file.url }}" target="_blank">Download PDF</a>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            {% if not weeks %}
+                <p>No resources available.</p>
+            {% endif %}
             </div>
+
+
+
+
             <div id="course_info" class="content-section hidden">
                 <h2>Course Info</h2>
-                <!-- Include your discussions content here -->
+            <h2>{{ course.title }}</h2>
+            <p>{{ course.description }}</p>
+            <br>
+
+            <!-- Additional course details -->
+            <h4>What you'll learn</h4>
+            <p>{{ course.what_you_will_learn }}</p>
+
+            <br>
+            <h4>This course includes:</h4>
+            <p>{{ course.this_course_includes }}</p>
+            <br>
             </div>
+
             <div id="career_guidance" class="content-section hidden">
-                <h2>Career Guidance</h2>
-                <!-- Include your discussions content here -->
+            <h2>Career Guidance</h2>
+            <ul id="career-guidance-list">
+                <!-- Career guidance messages will be appended here by JavaScript -->
+            </ul>
+            <p id="no-career-guidance" class="hidden">No career guidance available.</p>
             </div>
+
+
             <div id="qp" class="content-section hidden">
                 <h2>Question Paper</h2>
                 <!-- Include your discussions content here -->
@@ -220,6 +262,174 @@ $(document).ready(function() {
     // Load notes on page load
     loadNotes();
 });
+
+
+
+$(document).ready(function() {
+    // Function to show the correct section based on the sidebar link clicked
+    $('.list-group-item').click(function() {
+        var section = $(this).data('section');
+        $('.content-section').addClass('hidden');
+        $('#' + section).removeClass('hidden');
+
+        if (section === 'messages') {
+            loadMessages();
+        }
+    });
+
+    // Function to load messages via AJAX
+    function loadMessages() {
+        var courseId = {{ course.id }};
+        $.ajax({
+            url: '/courses/' + courseId + '/messages/json/',
+            method: 'GET',
+            success: function(response) {
+                var messagesList = $('#messages-list');
+                var noMessages = $('#no-messages');
+                messagesList.empty();  // Clear the existing messages
+
+                if (response.messages.length > 0) {
+                    response.messages.forEach(function(message) {
+                        messagesList.append('<li>' + message.content + '</li>');
+                    });
+                    noMessages.addClass('hidden');
+                } else {
+                    noMessages.removeClass('hidden');
+                }
+            },
+            error: function() {
+                alert('Error loading messages.');
+            }
+        });
+    }
+});
+
+
+
+
+
+
+    $(document).ready(function() {
+    // Function to show the correct section based on the sidebar link clicked
+    $('.list-group-item').click(function() {
+        var section = $(this).data('section');
+        $('.content-section').addClass('hidden');
+        $('#' + section).removeClass('hidden');
+
+        if (section === 'messages') {
+            loadMessages();
+        } else if (section === 'career_guidance') {
+            loadCareerGuidance();
+        }
+    });
+
+    // Function to load messages via AJAX
+    function loadMessages() {
+        var courseId = {{ course.id }};
+        $.ajax({
+            url: '/courses/' + courseId + '/messages/json/',
+            method: 'GET',
+            success: function(response) {
+                var messagesList = $('#messages-list');
+                var noMessages = $('#no-messages');
+                messagesList.empty();  // Clear the existing messages
+
+                if (response.messages.length > 0) {
+                    response.messages.forEach(function(message) {
+                        messagesList.append('<li>' + message.content + '</li>');
+                    });
+                    noMessages.addClass('hidden');
+                } else {
+                    noMessages.removeClass('hidden');
+                }
+            },
+            error: function() {
+                alert('Error loading messages.');
+            }
+        });
+    }
+
+    // Function to load career guidance messages via AJAX
+    function loadCareerGuidance() {
+        var courseId = {{ course.id }};
+        $.ajax({
+            url: '/courses/' + courseId + '/career_guidance/json/',
+            method: 'GET',
+            success: function(response) {
+                var guidanceList = $('#career-guidance-list');
+                var noGuidance = $('#no-career-guidance');
+                guidanceList.empty();  // Clear the existing guidance messages
+
+                if (response.guidance_messages.length > 0) {
+                    response.guidance_messages.forEach(function(message) {
+                        guidanceList.append('<li>' + message.content + '</li>');
+                    });
+                    noGuidance.addClass('hidden');
+                } else {
+                    noGuidance.removeClass('hidden');
+                }
+            },
+            error: function() {
+                alert('Error loading career guidance.');
+            }
+        });
+    }
+});
+
+
+
+
+
+
+
+// JavaScript code
+// JavaScript code
+$(document).ready(function() {
+    // Function to show the correct section based on the sidebar link clicked
+    $('.list-group-item').click(function() {
+        var section = $(this).data('section');
+        $('.content-section').addClass('hidden');
+        $('#' + section).removeClass('hidden');
+
+        if (section === 'resources') {
+            loadResources();
+        }
+    });
+
+    // Function to load resources via AJAX
+    function loadResources() {
+        var courseId = {{ course.id }};
+        $.ajax({
+            url: '/courses/' + courseId + '/resources/json/',
+            method: 'GET',
+            success: function(response) {
+                var resourcesSection = $('#resources');
+                resourcesSection.empty();  // Clear the existing resources
+
+                if (response.weeks.length > 0) {
+                    response.weeks.forEach(function(weekData) {
+                        var weekHTML = '<h3>' + weekData.week_title + '</h3>'; // Display the week title
+                        weekData.resources.forEach(function(resource) {
+                            weekHTML += '<p>' + resource.title + '</p>';
+                            if (resource.pdf_file) {
+                                weekHTML += '<a href="' + resource.pdf_file + '" target="_blank">Download PDF</a>'; // Display PDF link
+                            }
+                        });
+                        resourcesSection.append(weekHTML);
+                    });
+                } else {
+                    resourcesSection.append('<p>No resources available.</p>');
+                }
+            },
+            error: function() {
+                alert('Error loading resources.');
+            }
+        });
+    }
+});
+
+
+
 </script>
 </body>
 </html>

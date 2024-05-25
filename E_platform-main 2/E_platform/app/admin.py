@@ -27,6 +27,14 @@ admin.site.register(Referral)
 admin.site.register(PaymentHistory)
 
 admin.site.register(Note)
+admin.site.register(Message)
+admin.site.register(CareerGuidanceMessage)
+admin.site.register(Resource)
+
+
+
+
+
 
 
 

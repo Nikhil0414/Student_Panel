@@ -13,7 +13,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest, FileResponse, HttpResponse
 from django.http import JsonResponse
-from .models import Post, Comment
+from .models import Post, Comment, Message, CareerGuidanceMessage
 
 
 # Create your views here.
@@ -342,8 +342,6 @@ def dislike_comment(request, comment_id):
     return JsonResponse({'dislikes': comment.dislikes})
 
 
-
-
 @login_required
 def view_cart(request):
     cart_courses = request.user.student.cart.all()
@@ -372,6 +370,7 @@ def remove_from_cart(request, course_id):
                 return redirect('view_cart')  # Redirect to the cart page after removal
     return redirect('view_cart')
 
+
 def add_to_wishlist(request, course_id):
     if request.method == 'POST':
         course = Course.objects.get(id=course_id)
@@ -380,6 +379,7 @@ def add_to_wishlist(request, course_id):
         return redirect('view_course_details', course_id=course_id)
     else:
         return redirect('course_catalog')  # Redirect to course catalog if not a POST request
+
 
 def wishlist(request):
     student = request.user.student
@@ -559,9 +559,55 @@ def add_note(request, course_id):
         return JsonResponse({'status': 'success', 'note': {'content': note.content, 'created_at': note.created_at}})
     return JsonResponse({'status': 'error'}, status=400)
 
+
 @login_required
 def get_notes(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     student = get_object_or_404(Student, user=request.user)
     notes = Note.objects.filter(course=course, student=student).values('content', 'created_at')
     return JsonResponse({'status': 'success', 'notes': list(notes)})
+
+
+def get_messages(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    course_messages = Message.objects.filter(course=course)
+    context = {
+        'course': course,
+        'course_messages': course_messages,
+    }
+    return render(request, 'start_course.html', context)
+
+
+def get_course_messages_json(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    messages = Message.objects.filter(course=course).values('content')
+    return JsonResponse({'messages': list(messages)})
+
+
+def get_career_guidance_json(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    guidance_messages = CareerGuidanceMessage.objects.filter(course=course).values('content')
+    return JsonResponse({'guidance_messages': list(guidance_messages)})
+
+
+# views.py
+
+def get_course_details(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    weeks = Week.objects.filter(course=course)
+    context = {
+        'course': course,
+        'weeks': weeks,
+    }
+    return render(request, 'course_details.html', context)
+
+
+def get_course_resources_json(request, course_id):
+    course = Course.objects.get(pk=course_id)
+    weeks = Week.objects.filter(course=course).order_by('number')  # Ensure weeks are ordered correctly
+    resources_data = []
+    for week in weeks:
+        resources = Resource.objects.filter(week=week)
+        resources_list = [{'title': resource.title, 'pdf_file': resource.pdf_file.url} for resource in resources]
+        resources_data.append({'week_title': week.title, 'resources': resources_list})
+    return JsonResponse({'weeks': resources_data})
