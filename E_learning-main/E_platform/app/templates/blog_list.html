@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Posts</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .post-card {
+            margin-bottom: 20px;
+            max-width: 300px; /* Set maximum width */
+        }
+        .post-card .card-body {
+            display: flex;
+            flex-direction: column; /* Change to column layout */
+            align-items: flex-start; /* Align items to start */
+        }
+        .post-card .card-title {
+            margin-bottom: 10px; /* Adjust margin bottom */
+        }
+        .post-card .post-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .post-card img {
+            max-width: 100%; /* Ensure image doesn't exceed card width */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 10px; /* Add margin bottom */
+            border-radius: 5px; /* Add border radius */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">E-Learning</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'course_catalog' %}">Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'enrolled_course' %}">Enrolled Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'view_cart' %}">Cart</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'wishlist' %}">Wishlist</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'support' %}">Support</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'referrals' %}">Referrals</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Blogs</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Profile
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'update_profile' %}">Update</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    {% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Blogs</h1>
+        <a href="{% url 'blog_create' %}" class="btn btn-primary">Add Blog</a>
+    </div>
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-4"> <!-- Adjust grid to show three cards per row -->
+            <div class="card post-card">
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                <div class="card-body">
+                    <div>
+                        <h5 class="card-title">
+                            <a href="{% url 'blog_detail' post.id %}">{{ post.title }}</a>
+                        </h5>
+                        <p class="card-text">by {{ post.author }}</p>
+                        <p class="post-date">{{ post.published_at|date:"F j, Y, g:i a" }}</p>
+                    </div>
+                    <a href="{% url 'blog_detail' post.id %}" class="btn btn-outline-secondary">Read More</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

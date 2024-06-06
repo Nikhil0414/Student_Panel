@@ -7,24 +7,63 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #007BFF;
         }
         .question {
+            background-color: #fff;
             margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .question h3 {
+            margin-top: 0;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
         }
         .correct {
             color: green;
+            font-weight: bold;
         }
         .incorrect {
             color: red;
+            font-weight: bold;
         }
         .correct-answer {
             color: blue;
+            font-weight: bold;
+        }
+        .summary {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+        .summary p {
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <h1>Quiz Results for {{ quiz.title }}</h1>
-    
+
     {% for question in questions %}
     <div class="question">
         <h3>Question {{ question.question_no }}: {{ question.question_text }}</h3>
@@ -51,7 +90,7 @@
                             <strong>Reason:</strong> {{ question.reason }}
                         {% else %}
                             <span class="incorrect">(Incorrect)</span><br>
-                            <strong>Correct Answer:</strong> 
+                            <strong>Correct Answer:</strong>
                             <span class="correct-answer">
                                 {{ question.correct_option|get_option_text:question }}
                             </span><br>
@@ -63,10 +102,12 @@
         </p>
     </div>
     {% endfor %}
-    
-    <h2>Summary</h2>
-    <p>Total Questions: {{ questions|length }}</p>
-    <p>Correct Answers: {{ quiz_result.correct_answers_count }}</p>
-    <p>Score: {{ percentage_score }}%</p>
+
+    <div class="summary">
+        <h2>Summary</h2>
+        <p>Total Questions: {{ questions|length }}</p>
+        <p>Correct Answers: {{ quiz_result.correct_answers_count }}</p>
+        <p>Score: {{ percentage_score }}%</p>
+    </div>
 </body>
 </html>

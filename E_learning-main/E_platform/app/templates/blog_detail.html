@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Catalog</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">E-Learning</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'course_catalog' %}">Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'enrolled_course' %}">Enrolled Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'view_cart' %}">Cart</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'wishlist' %}">Wishlist</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'support' %}">Support</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'referrals' %}">Referrals</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'blog_list' %}">Blogs</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Profile
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'update_profile' %}">Update</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+{% block content %}
+        <div class="container mt-5">
+            <h1>{{ post.title }}</h1>
+            <p>By {{ post.author }} on {{ post.published_at }}</p>
+            {% if post.author == user %}
+                <a href="{% url 'blog_update' post.id %}" class="btn btn-primary">Edit</a> |
+                <form action="{% url 'blog_delete' post.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            {% endif %}
+            <br><br>
+
+            {% if post.image %}
+                <img src="{{ post.image.url }}" class="img-fluid" alt="{{ post.title }}">
+            {% endif %}
+            <br><br>
+            <p>{{ post.content }}</p>
+
+            <br>
+
+        <h2>Comments</h2>
+            {% if comments %}
+            <ul class="list-group">
+                {% for comment in comments %}
+                <li class="list-group-item">{{ comment.author }}: {{ comment.content }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No comments yet.</p>
+            {% endif %}
+        <br>
+        <h3>Add a comment</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_content">Your Comment:</label>
+                <textarea class="form-control" id="id_content" name="content" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+        <br><br><br><br>
+        </div>
+
+{% endblock %}
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

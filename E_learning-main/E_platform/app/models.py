@@ -59,6 +59,7 @@ class Student(models.Model):
     def __str__(self) -> str:
         return self.Full_Name
 
+
 class Week(models.Model):
     course = models.ForeignKey(Course, related_name='weeks', on_delete=models.CASCADE)
     number = models.PositiveIntegerField()
@@ -100,9 +101,9 @@ class Quiz(models.Model):
     due_date = models.DateTimeField(default=timezone.now)
     time_limit = models.TimeField(default=time(0, 30))
 
-
     def __str__(self):
         return self.title
+
 
 class QuizQuestion(models.Model):
     quiz = models.ForeignKey(Quiz, related_name='quiz_questions', on_delete=models.CASCADE)
@@ -124,8 +125,9 @@ class QuizQuestion(models.Model):
     reason = models.TextField()
 
     def __str__(self):
-        return f"{self.quiz.course} - {self.quiz.topic}"  
-    
+        return f"{self.quiz.course} - {self.quiz.topic}"
+
+
 class QuizResult(models.Model):
     student = models.ForeignKey(Student, related_name='quiz_results', on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, related_name='results', on_delete=models.CASCADE)
@@ -135,7 +137,8 @@ class QuizResult(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} - {self.quiz.title} - {self.score}/{self.total_questions}"
-    
+
+
 class SelectedAnswer(models.Model):
     student = models.ForeignKey(Student, related_name='selected_answers', on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, related_name='selected_answers', on_delete=models.CASCADE)
@@ -145,10 +148,12 @@ class SelectedAnswer(models.Model):
     def __str__(self):
         return f"{self.student.user.username} - {self.quiz.title} - Question {self.question.question_no} - Option {self.selected_option}"
 
+
 class StudentCourseProgress(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     completed_weeks = models.ManyToManyField(Week, blank=True)
+
 
 class Certificate(models.Model):
     user = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -158,7 +163,8 @@ class Certificate(models.Model):
 
     def __str__(self):
         return f"{self.user.Full_Name}'s Certificate for {self.course.title}"
-    
+
+
 class Grade(models.Model):
     certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE)
     grade = models.CharField(max_length=2)
@@ -166,25 +172,13 @@ class Grade(models.Model):
     def __str__(self):
         return f"{self.certificate.course} - {self.grade}"
 
+
 class Enrollment(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.user} enrolled in {self.course.title}"
-
-
-class Mentorship(models.Model):
-    user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, null=True)
-    email = models.EmailField(null=True)
-    reason = models.TextField()
-    phone_number = models.CharField(max_length=15)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)  # Assuming each mentorship is associated with a course
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Mentorship for {self.user.username}"
 
 
 class QuestionPaper(models.Model):
@@ -197,24 +191,6 @@ class QuestionPaper(models.Model):
 
     def __str__(self):
         return self.title
-
-
-
-class Post(models.Model):
-    user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
-    content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    likes = models.IntegerField(default=0)
-    dislikes = models.IntegerField(default=0)
-
-
-class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
-    content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    likes = models.IntegerField(default=0)
-    dislikes = models.IntegerField(default=0)
 
 
 class Ticket(models.Model):
@@ -242,7 +218,6 @@ class Ticket(models.Model):
         return f"Ticket #{self.id} - {self.user.email}"
 
 
-
 class Profile(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
@@ -265,6 +240,7 @@ class WorkExperience(models.Model):
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField()
 
+
 class Education(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     institution_name = models.CharField(max_length=255)
@@ -272,6 +248,7 @@ class Education(models.Model):
     field_of_study = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
+
 
 class Project(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -281,6 +258,7 @@ class Project(models.Model):
     end_date = models.DateField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
+
 class PrivacySettings(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     show_profile_to_logged_in_users = models.BooleanField(default=True)
@@ -288,6 +266,7 @@ class PrivacySettings(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Privacy Settings"
+
 
 class NotificationSettings(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -298,6 +277,7 @@ class NotificationSettings(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Notification Settings"
 
+
 class Referral(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     friend_email = models.EmailField()
@@ -305,7 +285,6 @@ class Referral(models.Model):
 
     def __str__(self):
         return f"{self.user.username} referred {self.friend_email}"
-
 
 
 class PaymentHistory(models.Model):
@@ -339,7 +318,8 @@ class Message(models.Model):
 
 
 class CareerGuidanceMessage(models.Model):
-    course = models.ForeignKey(Course, related_name='career_guidance_messages', on_delete=models.CASCADE, null=True, blank=True)
+    course = models.ForeignKey(Course, related_name='career_guidance_messages', on_delete=models.CASCADE, null=True,
+                               blank=True)
     content = models.TextField()
 
     def __str__(self):
@@ -355,3 +335,49 @@ class Resource(models.Model):
 
     def __str__(self):
         return f"Resource '{self.title}' for Week {self.week.number}"
+
+
+class BlogPost(models.Model):
+    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='blog_posts')
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(default=timezone.now)
+    tags = models.CharField(max_length=100, blank=True, null=True)
+    image = models.ImageField(upload_to='staticfiles/blog_images/', null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+
+class BlogComment(models.Model):
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='blog_comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Comment by {self.author} on {self.post}"
+
+
+class Discussion(models.Model):
+    course = models.ForeignKey(Course, related_name='discussions', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200, null=True, blank=True)
+    user = models.ForeignKey(get_user_model(), related_name='discussions', on_delete=models.CASCADE, null=True, blank=True)  # Added user field
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class MentorshipRequest(models.Model):
+    user = models.ForeignKey(get_user_model(), related_name='mentorship_requests', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, related_name='mentorship_requests', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    reason = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.email} - Course: {self.course.title}"

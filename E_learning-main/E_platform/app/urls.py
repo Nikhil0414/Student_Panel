@@ -11,7 +11,6 @@ urlpatterns = [
     path('course_catalog', course_catalog, name='course_catalog'),
     path('career_roadmap', career_roadmap, name='career_roadmap'),
 
-    path('mentorship_page/', homepage, name='mentorship_page'),
     path('paymenthandler/', paymenthandler, name='paymenthandler'),
     path('course/<int:course_id>/', view_course_details, name='view_course_details'),
     path('enroll-course/<int:course_id>/', enroll_course, name='enroll_course'),
@@ -20,15 +19,6 @@ urlpatterns = [
     path('enrolled-courses/<int:course_id>/start-course', start_course, name='start_course'),
     path('start-course/<int:course_id>/previous_question_papers/', previous_question_papers,
          name='previous_question_papers'),
-
-    path('community/',community_platform, name='community_platform'),
-    path('community/add_post/',add_post, name='add_post'),
-    path('community/add_comment/<int:post_id>/',add_comment, name='add_comment'),
-
-    path('like_post/<int:post_id>/',like_post, name='like_post'),
-    path('dislike_post/<int:post_id>/',dislike_post, name='dislike_post'),
-    path('like_comment/<int:comment_id>/', like_comment, name='like_comment'),
-    path('dislike_comment/<int:comment_id>/', dislike_comment, name='dislike_comment'),
 
     path('add-to-cart/<int:course_id>/', add_to_cart, name='add_to_cart'),
     path('view-cart/', view_cart, name='view_cart'),
@@ -59,7 +49,8 @@ urlpatterns = [
     path('courses/<int:course_id>/messages/json/', get_course_messages_json, name='get_course_messages_json'),
     path('courses/<int:course_id>/career_guidance/json/', get_career_guidance_json, name='get_career_guidance_json'),
     path('courses/<int:course_id>/resources/json/', get_course_resources_json, name='get_course_resources_json'),
-
+    path('courses/<int:course_id>/discussions/json/', get_discussions, name='get_discussions'),
+    path('courses/<int:course_id>/add_discussion/', add_discussion, name='add_discussion'),
 
     path('certificate/', certificate, name='certificates'),
     path('download-certificate/<int:certificate_id>/', download_certificate, name='download-certificate'),
@@ -70,5 +61,13 @@ urlpatterns = [
     path('course/<int:course_id>/topic/<int:topic_id>/', watch_topic, name='watch_topic'),
     path('quiz/<int:quiz_id>/', display_quiz, name='display_quiz'),
     path('quiz/<int:quiz_id>/result/', quiz_result, name='quiz_result'),
-    
+
+    path('blog/', blog_list, name='blog_list'),
+    path('blog/<int:post_id>/', blog_detail, name='blog_detail'),
+    path('blog/new/', blog_create, name='blog_create'),
+    path('blog/<int:post_id>/edit/', blog_update, name='blog_update'),
+    path('blog/<int:post_id>/delete/', blog_delete, name='blog_delete'),
+
+    path('mentorship/', mentorship_form, name='mentorship_form'),
+
 ]

@@ -47,8 +47,6 @@
         <ul class="navbar-nav ml-auto">
             <li class="nav-item"><a class="nav-link" href="{% url 'course_catalog' %}">Courses</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'enrolled_course' %}">Enrolled Courses</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'community_platform' %}">Community</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'mentorship_page' %}">Personal Mentorship</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'support' %}">Support</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
         </ul>
@@ -70,7 +68,7 @@
                 <a href="#" class="list-group-item list-group-item-action" data-section="course_info">Course Info</a>
                 <a href="#" class="list-group-item list-group-item-action" data-section="career_guidance">Career Guidance</a>
                 <a href="#" class="list-group-item list-group-item-action" data-section="qp">Question Paper</a>
-                <a href="#" class="list-group-item list-group-item-action" data-section="1_on_1">1-on-1 Mentorship</a>
+                <a href="#" class="list-group-item list-group-item-action" data-section="mentorship">1-on-1 Mentorship</a>
             </div>
         </div>
         <!-- Main Content -->
@@ -134,47 +132,46 @@
 </div>
         
             <!-- Grades Section -->
-            <div id="grades" class="content-section hidden">
-                <h2>Grades Section</h2>
-                <table class="grades-table">
-                    <thead>
-                        <tr>
-                            <th>Items</th>
-                            <th>Status</th>
-                            <th>Due</th>
-                            <th>Weight</th>
-                            <th>Grade</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for quiz in quizzes_data %}
-                        <tr>
-                            <td>
-                                <div class="quiz-row">
-                                    <img src="/static/icons/play-icon.png" alt="Play" class="play-icon">
-                                    <div class="quiz-info">
-                                        <a href="{% url 'quiz_result' quiz.quiz_id %}">
-                                            <strong>{{ quiz.video_title }}</strong><br>
-                                            
-                                        </a>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="quiz-status {{ quiz.status|lower }}">
-                                {% if quiz.status == 'Locked' %}
-                                    <span class="locked-icon">🔒</span> {{ quiz.status }}
-                                {% else %}
-                                    <span class="unlocked-icon">🔓</span> {{ quiz.status }}
-                                {% endif %}
-                            </td>
-                            <td>{{ quiz.due_date|date:"M j, h:i A T" }}</td>
-                            <td>{{ quiz.weight }}%</td>
-                            <td>{{ quiz.score }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<div id="grades" class="content-section hidden" style="margin: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <h2 style="font-size: 24px; margin-bottom: 20px; color: #333; text-align: center;">Grades Section</h2>
+    <table class="grades-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr>
+                <th style="padding: 12px 15px; background-color: #007BFF; color: #ffffff; text-align: left;">Items</th>
+                <th style="padding: 12px 15px; background-color: #007BFF; color: #ffffff; text-align: left;">Status</th>
+                <th style="padding: 12px 15px; background-color: #007BFF; color: #ffffff; text-align: left;">Due</th>
+                <th style="padding: 12px 15px; background-color: #007BFF; color: #ffffff; text-align: left;">Weight</th>
+                <th style="padding: 12px 15px; background-color: #007BFF; color: #ffffff; text-align: left;">Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quiz in quizzes_data %}
+            <tr style="background-color: {% cycle '#f2f2f2' '#ffffff' %};">
+                <td style="padding: 12px 15px;">
+                    <div class="quiz-row" style="display: flex; align-items: center;">
+                        <div class="quiz-info">
+                            <a href="{% url 'quiz_result' quiz.quiz_id %}" style="text-decoration: none; color: #007BFF; font-weight: bold;">
+                                <strong>Quiz - {{ quiz.video_title }}</strong><br>
+                            </a>
+                        </div>
+                    </div>
+                </td>
+                <td class="quiz-status {{ quiz.status|lower }}" style="padding: 12px 15px; display: flex; align-items: center;">
+                    {% if quiz.status == 'Locked' %}
+                        <span class="status-icon" style="margin-right: 8px; color: #dc3545;">🔒</span> {{ quiz.status }}
+                    {% else %}
+                        <span class="status-icon" style="margin-right: 8px; color: #28a745;">🔓</span> {{ quiz.status }}
+                    {% endif %}
+                </td>
+                <td style="padding: 12px 15px;">{{ quiz.due_date|date:"M j, h:i A T" }}</td>
+                <td style="padding: 12px 15px;">{{ quiz.weight }}%</td>
+                <td style="padding: 12px 15px;">{{ quiz.score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
         
             <!-- Notes Section -->
             <div id="notes" class="content-section hidden">
@@ -191,8 +188,27 @@
             <!-- Discussions Section -->
             <div id="discussions" class="content-section hidden">
                 <h2>Discussion Forum</h2>
-                <!-- Include your discussions content here -->
+                    <div class="mt-4">
+                    <h4>Start a New Discussion</h4>
+                    <form id="discussion-form">
+                        <div class="form-group">
+                            <label for="discussion-title">Title</label>
+                            <input type="text" id="discussion-title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="discussion-content">Content</label>
+                            <textarea id="discussion-content" class="form-control" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Post Discussion</button>
+                    </form>
+                </div>
+                <div id="discussion-list">
+                    <!-- Discussions will be appended here -->
+                </div>
+
             </div>
+
+
 
 
 
@@ -255,10 +271,41 @@
                 <h2>Question Paper</h2>
                 <!-- Include your discussions content here -->
             </div>
-            <div id="1_on_1" class="content-section hidden">
+
+
+
+            <!-- Mentorship Section -->
+            <div id="mentorship" class="content-section hidden">
                 <h2>1-on-1 Mentorship</h2>
-                <!-- Include your discussions content here -->
+                <div class="card">
+                    <small class="muted">Want 1-on-1 mentorship? Pay ₹200</small>
+                    <!-- Form for user details and mentorship reason -->
+                    <form id="mentorship-form">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reason">Reason for seeking mentorship</label>
+                            <textarea class="form-control" id="reason" rows="3" placeholder="Enter your reason" required></textarea>
+                        </div>
+                        <!-- Payment Button -->
+                        <div class="btn_container">
+                        <button class="btn btn-primary" id="pay-btn" data-course-id="courseId">Pay</button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
+
 
 
 
@@ -266,16 +313,18 @@
             <!-- Add other sections like discussions, messages, resources, etc. similarly -->
         
         </div>
+    </div>
+</div>
         
         <!-- Bootstrap JS and dependencies -->
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         
         <!-- jQuery and AJAX -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        
-        <script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
         $(document).ready(function() {
             // Function to show the correct section based on the sidebar link clicked
             $('.list-group-item').click(function() {
@@ -571,7 +620,123 @@ $(document).ready(function() {
         });
     }
 });
-        </script>
-        
+
+
+
+
+$(document).ready(function() {
+    $('.list-group-item').click(function() {
+        var section = $(this).data('section');
+        $('.content-section').addClass('hidden');
+        $('#' + section).removeClass('hidden');
+
+        if (section === 'messages') {
+            loadMessages();
+        }
+    });
+
+    $('.toggle-like').click(function() {
+        var postId = $(this).data('post-id');
+        var button = $(this);
+        $.ajax({
+            url: '/posts/' + postId + '/toggle_like/',
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                button.text('👍 ' + response.likes_count + ' Like');
+            }
+        });
+    });
+});
+
+
+
+
+
+$(document).ready(function() {
+    // Function to show the correct section based on the sidebar link clicked
+    $('.list-group-item').click(function() {
+        var section = $(this).data('section');
+        $('.content-section').addClass('hidden');
+        $('#' + section).removeClass('hidden');
+
+        if (section === 'discussions') {
+            loadDiscussions();
+        }
+    });
+
+    // Function to load discussions via AJAX
+    function loadDiscussions() {
+        var courseId = {{ course.id }};
+        $.ajax({
+            url: '/courses/' + courseId + '/discussions/json/',
+            method: 'GET',
+            success: function(response) {
+                var discussionList = $('#discussion-list');
+                discussionList.empty();  // Clear the existing discussions
+
+                if (response.discussions.length > 0) {
+                    response.discussions.forEach(function(discussion) {
+                        discussionList.append('<div class="discussion"><h5>' + discussion.title + '</h5><p>' + discussion.content + '</p><small>' + discussion.created_at + '</small></div>');
+                    });
+                } else {
+                    discussionList.append('<p>No discussions available.</p>');
+                }
+            },
+            error: function() {
+                alert('Error loading discussions.');
+            }
+        });
+    }
+
+    // Function to handle posting a new discussion
+    $('#discussion-form').submit(function(event) {
+        event.preventDefault();
+        var title = $('#discussion-title').val();
+        var content = $('#discussion-content').val();
+        var courseId = {{ course.id }};
+
+        $.ajax({
+            url: '/courses/' + courseId + '/add_discussion/',
+            method: 'POST',
+            data: {
+                title: title,
+                content: content,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#discussion-title').val('');
+                    $('#discussion-content').val('');
+                    loadDiscussions();
+                } else {
+                    alert('Error posting discussion.');
+                }
+            }
+        });
+    });
+
+    // Load discussions on page load if the discussion section is visible
+    if ($('#discussions').is(':visible')) {
+        loadDiscussions();
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
 </body>
 </html>

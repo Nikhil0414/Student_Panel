@@ -13,30 +13,34 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest, FileResponse, HttpResponse
 from django.http import JsonResponse, Http404
-from .models import Post, Comment
 from django.utils import timezone
 from django.urls import reverse
+from .models import BlogPost
+from .forms import BlogPostForm, BlogCommentForm
+
 
 # Create your views here.
 
-    
+
 @login_required
 def all_course_progress(request):
     student = Student.objects.get(user=request.user)
     enrollments = Enrollment.objects.filter(user=student)
-    
+
     course_progress_data = []
-    
+
     for enrollment in enrollments:
         course = enrollment.course
         total_topics = sum(week.topics.count() for week in course.weeks.all())
-        watched_topics = sum(topic.watched_by_users.filter(id=student.id).exists() for week in course.weeks.all() for topic in week.topics.all())
+        watched_topics = sum(
+            topic.watched_by_users.filter(id=student.id).exists() for week in course.weeks.all() for topic in
+            week.topics.all())
 
         if total_topics > 0:
             progress_percentage = round((watched_topics / total_topics) * 100)
         else:
             progress_percentage = 0
-        
+
         course_progress_data.append({
             'course': course,
             'total_topics': total_topics,
@@ -54,7 +58,7 @@ def all_course_progress(request):
         'course_progress_data': filtered_courses,
         'filter_status': filter_status,
     }
-    
+
     return render(request, 'my_courses.html', context)
 
 
@@ -84,7 +88,8 @@ def view_question_paper(request, pk):
 def download_question_paper(request, pk):
     question_paper = get_object_or_404(QuestionPaper, pk=pk)
     response = FileResponse(question_paper.file.open(), content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{question_paper.grade}th - {question_paper.subject}({question_paper.year}).pdf"'
+    response[
+        'Content-Disposition'] = f'attachment; filename="{question_paper.grade}th - {question_paper.subject}({question_paper.year}).pdf"'
     return response
 
 
@@ -92,12 +97,12 @@ def download_question_paper(request, pk):
 def start_course(request, course_id):
     user = Student.objects.get(user=request.user)
     course = get_object_or_404(Course, id=course_id)
-    
+
     weeks = Week.objects.filter(course=course).prefetch_related('topics')
-    
+
     watched_topics = Topic.objects.filter(watched_by_users=user, week__course=course)
     unlocked_quizzes = Quiz.objects.filter(topic__in=watched_topics)
-    
+
     quizzes_data = []
     for quiz in unlocked_quizzes:
         quizzes_data.append({
@@ -106,7 +111,8 @@ def start_course(request, course_id):
             'status': 'Unlocked' if user in quiz.topic.watched_by_users.all() else 'Locked',
             'due_date': quiz.due_date,
             'weight': quiz.weight,
-            'score': round(quiz.results.get(student=user).score / quiz.results.get(student=user).total_questions * 100, 2) if quiz.results.filter(student=user).exists() else 'N/A'
+            'score': round(quiz.results.get(student=user).score / quiz.results.get(student=user).total_questions * 100,
+                           2) if quiz.results.filter(student=user).exists() else 'N/A'
         })
 
     return render(request, 'start_course.html', {
@@ -118,16 +124,16 @@ def start_course(request, course_id):
 
 
 def watch_topic(request, course_id, topic_id):
-    user = request.user.student     
+    user = request.user.student
     course = get_object_or_404(Course, id=course_id)
     topic = get_object_or_404(Topic, id=topic_id)
-    
+
     topic.watched_by_users.add(user)
-    
+
     weeks = Week.objects.filter(course=course).prefetch_related('topics')
-    
+
     all_topics = Topic.objects.filter(week__course=course)  # Fetch all topics related to the course
-    
+
     return render(request, 'watch_topic.html', {
         'course': course,
         'weeks': weeks,
@@ -166,14 +172,14 @@ def display_quiz(request, quiz_id):
             defaults={
                 'score': score,
                 'total_questions': total_questions,
-                'completed_at': timezone.now()  
+                'completed_at': timezone.now()
             }
         )
 
         course_id = quiz.course.id
         success_url = reverse('start_course', kwargs={'course_id': course_id})
         return redirect(success_url)
-    
+
     return render(request, 'quiz_detail.html', {
         'quiz': quiz,
         'questions': questions
@@ -187,8 +193,9 @@ def quiz_result(request, quiz_id):
     questions = quiz.quiz_questions.all().order_by('question_no')
     quiz_result = get_object_or_404(QuizResult, quiz=quiz, student=student)
     selected_answers = SelectedAnswer.objects.filter(student=student, quiz=quiz).select_related('question')
-    
-    correct_answers_count = sum(1 for answer in selected_answers if answer.selected_option == answer.question.correct_option)
+
+    correct_answers_count = sum(
+        1 for answer in selected_answers if answer.selected_option == answer.question.correct_option)
     percentage_score = (correct_answers_count / questions.count()) * 100 if questions.count() > 0 else 0
 
     context = {
@@ -245,21 +252,22 @@ def download_certificate(request, certificate_id):
     certificate = get_object_or_404(Certificate, id=certificate_id, user__user=request.user)
     if not certificate.certificate_image:
         raise Http404("Certificate image not found")
-    
+
     # Open the image file
     file_path = certificate.certificate_image.path
     with open(file_path, 'rb') as f:
         response = HttpResponse(f.read(), content_type='image/jpeg')
-        response['Content-Disposition'] = f'attachment; filename="{certificate.user.Full_Name} certificate {certificate.course.title}.jpg"'
+        response[
+            'Content-Disposition'] = f'attachment; filename="{certificate.user.Full_Name} certificate {certificate.course.title}.jpg"'
         return response
-    
+
 
 @login_required
 def certificate(request):
     user = Student.objects.get(user=request.user)
-    
+
     # Calculate grades for the student
-    calculate_grade_for_student(user)    
+    calculate_grade_for_student(user)
 
     certificates = Certificate.objects.filter(user=user)
     courses_with_certificates = {}
@@ -273,6 +281,7 @@ def certificate(request):
         }
 
     return render(request, 'certificates.html', {'courses_with_certificates': courses_with_certificates})
+
 
 # ---------------------------------------------------------------------------
 # Login view
@@ -464,34 +473,6 @@ def previous_question_papers(request, course_id):
 razorpay_client = razorpay.Client(
     auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
 
-
-def homepage(request):
-    currency = 'INR'
-    amount = 20000  # Rs. 200
-
-    # Create a Razorpay Order
-    razorpay_order = razorpay_client.order.create(dict(amount=amount,
-                                                       currency=currency,
-                                                       payment_capture='0'))
-
-    # order id of newly created order.
-    razorpay_order_id = razorpay_order['id']
-    callback_url = 'paymenthandler/'
-
-    # we need to pass these details to frontend.
-    context = {}
-    context['razorpay_order_id'] = razorpay_order_id
-    context['razorpay_merchant_key'] = settings.RAZOR_KEY_ID
-    context['razorpay_amount'] = amount
-    context['currency'] = currency
-    context['callback_url'] = callback_url
-
-    return render(request, 'mentorship_page.html', context=context)
-
-
-# we need to csrf_exempt this url as
-# POST request will be made by Razorpay
-# and it won't have the csrf token.
 @csrf_exempt
 def paymenthandler(request):
     # only accept POST request.
@@ -538,62 +519,6 @@ def paymenthandler(request):
 
 
 @login_required
-def community_platform(request):
-    # Retrieve all posts for display
-    posts = Post.objects.all()
-    return render(request, 'community_platform.html', {'posts': posts})
-
-
-@login_required
-def add_post(request):
-    if request.method == 'POST':
-        content = request.POST.get('content')
-        user = request.user.student  # Get the Student instance associated with the logged-in user
-        post = Post.objects.create(user=user, content=content)
-        return redirect('community_platform')
-    return render(request, 'add_post.html')
-
-
-@login_required
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    if request.method == 'POST':
-        content = request.POST.get('content')
-        user = request.user.student  # Get the Student instance associated with the logged-in user
-        comment = Comment.objects.create(post=post, user=user, content=content)
-        return redirect('community_platform')
-    return render(request, 'add_comment.html', {'post': post})
-
-
-def like_post(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    post.likes += 1
-    post.save()
-    return JsonResponse({'likes': post.likes})
-
-
-def dislike_post(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    post.dislikes += 1
-    post.save()
-    return JsonResponse({'dislikes': post.dislikes})
-
-
-def like_comment(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    comment.likes += 1
-    comment.save()
-    return JsonResponse({'likes': comment.likes})
-
-
-def dislike_comment(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    comment.dislikes += 1
-    comment.save()
-    return JsonResponse({'dislikes': comment.dislikes})
-
-
-@login_required
 def view_cart(request):
     cart_courses = request.user.student.cart.all()
     return render(request, 'view_cart.html', {'cart_courses': cart_courses})
@@ -621,6 +546,7 @@ def remove_from_cart(request, course_id):
                 return redirect('view_cart')  # Redirect to the cart page after removal
     return redirect('view_cart')
 
+
 def add_to_wishlist(request, course_id):
     if request.method == 'POST':
         course = Course.objects.get(id=course_id)
@@ -629,6 +555,7 @@ def add_to_wishlist(request, course_id):
         return redirect('view_course_details', course_id=course_id)
     else:
         return redirect('course_catalog')  # Redirect to course catalog if not a POST request
+
 
 def wishlist(request):
     student = request.user.student
@@ -808,12 +735,14 @@ def add_note(request, course_id):
         return JsonResponse({'status': 'success', 'note': {'content': note.content, 'created_at': note.created_at}})
     return JsonResponse({'status': 'error'}, status=400)
 
+
 @login_required
 def get_notes(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     student = get_object_or_404(Student, user=request.user)
     notes = Note.objects.filter(course=course, student=student).values('content', 'created_at')
     return JsonResponse({'status': 'success', 'notes': list(notes)})
+
 
 def get_messages(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
@@ -858,3 +787,117 @@ def get_course_resources_json(request, course_id):
         resources_list = [{'title': resource.title, 'pdf_file': resource.pdf_file.url} for resource in resources]
         resources_data.append({'week_title': week.title, 'resources': resources_list})
     return JsonResponse({'weeks': resources_data})
+
+
+def blog_list(request):
+    posts = BlogPost.objects.all().order_by('-published_at')
+    return render(request, 'blog_list.html', {'posts': posts})
+
+
+def blog_detail(request, post_id):
+    post = get_object_or_404(BlogPost, id=post_id)
+    comments = post.comments.all().order_by('-created_at')
+
+    if request.method == 'POST':
+        comment_form = BlogCommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.author = request.user
+            comment.post = post
+            comment.save()
+            return redirect('blog_detail', post_id=post.id)
+    else:
+        comment_form = BlogCommentForm()
+
+    return render(request, 'blog_detail.html', {'post': post, 'comments': comments, 'comment_form': comment_form})
+
+
+
+@login_required
+def blog_create(request):
+    if request.method == 'POST':
+        form = BlogPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.instance.author = request.user
+            form.save()
+            return redirect('blog_list')
+    else:
+        form = BlogPostForm()
+    return render(request, 'blog_form.html', {'form': form})
+
+
+
+@login_required
+def blog_update(request, post_id):
+    post = get_object_or_404(BlogPost, id=post_id)
+    if request.method == 'POST':
+        form = BlogPostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('blog_detail', post_id=post.id)
+    else:
+        form = BlogPostForm(instance=post)
+    return render(request, 'blog_form.html', {'form': form})
+
+
+
+@login_required
+def blog_delete(request, post_id):
+    post = get_object_or_404(BlogPost, id=post_id)
+    if request.method == 'POST':
+        if post.author == request.user:
+            post.delete()
+        return redirect('blog_list')
+    return render(request, 'blog_confirm_delete.html', {'post': post})
+
+
+def get_discussions(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    discussions = course.discussions.all().order_by('-created_at')
+    discussions_data = [{
+        'title': discussion.title,
+        'content': discussion.content,
+        'created_at': discussion.created_at.strftime('%Y-%m-%d %H:%M:%S')
+    } for discussion in discussions]
+    return JsonResponse({'status': 'success', 'discussions': discussions_data})
+
+@csrf_exempt
+def add_discussion(request, course_id):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        course = get_object_or_404(Course, id=course_id)
+        discussion = Discussion.objects.create(
+            course=course,
+            title=title,
+            content=content,
+            created_at=timezone.now()
+        )
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+def mentorship_form(request):
+    if request.method == 'POST':
+        # Retrieve form data
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        reason = request.POST.get('reason')
+
+        # Perform any necessary validation
+
+        # Assuming you have a MentorshipRequest model
+        # Create a new mentorship request object
+        mentorship_request = MentorshipRequest.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            reason=reason
+        )
+
+        # Perform any additional actions like sending email notification, etc.
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error'})

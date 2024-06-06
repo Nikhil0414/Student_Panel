@@ -12,6 +12,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(max_length=255, widget=forms.PasswordInput(
         attrs={'placeholder': 'Password'}))
 
+
 class UserForm(forms.ModelForm):
     class Meta:
         models = CustomeUser
@@ -133,5 +134,18 @@ class ReferralForm(forms.ModelForm):
         labels = {
             'friend_email': 'Friend\'s Email'
         }
+
+
+class BlogPostForm(forms.ModelForm):
+    class Meta:
+        model = BlogPost
+        fields = ['title', 'content', 'tags', 'image']
+
+
+class BlogCommentForm(forms.ModelForm):
+    class Meta:
+        model = BlogComment
+        fields = ['content']
+
 
 
