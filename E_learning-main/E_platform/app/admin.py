@@ -36,6 +36,10 @@ admin.site.register(BlogComment)
 admin.site.register(Certificate)
 admin.site.register(Discussion)
 
+admin.site.register(Post)  # Register the Post model
+admin.site.register(Comment)  # Register the Comment model
+
+
 class QuestionInline(admin.TabularInline):
     model = QuizQuestion
     extra = 1  # Start with one extra form

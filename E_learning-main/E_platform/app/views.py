@@ -901,3 +901,73 @@ def mentorship_form(request):
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error'})
+
+
+def create_post(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    weeks = Week.objects.filter(course=course).prefetch_related('topics')
+    context = {
+        'course': course,
+        'weeks': weeks,
+    }
+    return render(request, 'create_post.html', context)
+
+
+
+
+@login_required
+def community_platform(request):
+    # Retrieve all posts for display
+    posts = Post.objects.all()
+    return render(request, 'community_platform.html', {'posts': posts})
+
+
+@login_required
+def add_post(request):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        user = request.user.student  # Get the Student instance associated with the logged-in user
+        post = Post.objects.create(user=user, content=content)
+        return redirect('community_platform')
+    return render(request, 'add_post.html')
+
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        user = request.user.student  # Get the Student instance associated with the logged-in user
+        comment = Comment.objects.create(post=post, user=user, content=content)
+        return redirect('community_platform')
+    return render(request, 'add_comment.html', {'post': post})
+
+
+def like_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    post.likes += 1
+    post.save()
+    return JsonResponse({'likes': post.likes})
+
+
+def dislike_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    post.dislikes += 1
+    post.save()
+    return JsonResponse({'dislikes': post.dislikes})
+
+
+def like_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    comment.likes += 1
+    comment.save()
+    return JsonResponse({'likes': comment.likes})
+
+
+def dislike_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    comment.dislikes += 1
+    comment.save()
+    return JsonResponse({'dislikes': comment.dislikes})
+
+

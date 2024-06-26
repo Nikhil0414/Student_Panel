@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -187,24 +189,36 @@
 
             <!-- Discussions Section -->
             <div id="discussions" class="content-section hidden">
-                <h2>Discussion Forum</h2>
-                    <div class="mt-4">
-                    <h4>Start a New Discussion</h4>
-                    <form id="discussion-form">
-                        <div class="form-group">
-                            <label for="discussion-title">Title</label>
-                            <input type="text" id="discussion-title" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="discussion-content">Content</label>
-                            <textarea id="discussion-content" class="form-control" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Post Discussion</button>
-                    </form>
-                </div>
-                <div id="discussion-list">
-                    <!-- Discussions will be appended here -->
-                </div>
+
+                <h1>Forum</h1>
+
+              <div class="forum-search">
+                <input type="text" placeholder="Search forum">
+                <button>Search</button>
+                <a href="/create_post/{{ course.id }}">Create Post</a>
+              </div>
+
+                <br><br>
+
+
+            <div class="forum-topics">
+                <h2>Common discussion forum</h2>
+                <p><a>Where ideas meet and grow</a>   (1432 Threads) <a href="/community" class="join-button">Join Now</a></p>
+
+              </div>
+
+
+
+                {% for week in course.weeks.all %}
+    <div class="card mt-4" id="week-{{ week.id }}">
+        <div class="card-header">
+            <h3>Week {{ week.number }}: {{ week.title }}</h3>
+            <p><a href="#">Discuss this weeks modules here.</a> (152 Threads)</p>
+                <p>Last post a day ago</p>
+        </div>
+            {% endfor %}
+    </div>
+
 
             </div>
 
@@ -269,7 +283,7 @@
 
             <div id="qp" class="content-section hidden">
                 <h2>Question Paper</h2>
-                <!-- Include your discussions content here -->
+
             </div>
 
 
