@@ -82,5 +82,6 @@ urlpatterns = [
     path('like_comment/<int:comment_id>/', like_comment, name='like_comment'),
     path('dislike_comment/<int:comment_id>/', dislike_comment, name='dislike_comment'),
 
-
+    path('get_notes/<int:course_id>/', get_notes, name='get_notes'),
+    path('save_note/<int:course_id>/', save_note, name='save_note'),
 ]

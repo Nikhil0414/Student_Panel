@@ -325,9 +325,6 @@ class CareerGuidanceMessage(models.Model):
         return f"Career Guidance for {self.course.title if self.course else 'No Course'}"
 
 
-
-# models.py
-
 class Resource(models.Model):
     week = models.ForeignKey(Week, related_name='resources', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)

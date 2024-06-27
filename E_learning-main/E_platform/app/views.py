@@ -19,9 +19,7 @@ from .models import BlogPost
 from .forms import BlogPostForm, BlogCommentForm
 from django.http import JsonResponse
 from .models import Course, Message
-
-
-# Create your views here.
+import json
 
 
 @login_required
@@ -739,13 +737,6 @@ def add_note(request, course_id):
     return JsonResponse({'status': 'error'}, status=400)
 
 
-@login_required
-def get_notes(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    student = get_object_or_404(Student, user=request.user)
-    notes = Note.objects.filter(course=course, student=student).values('content', 'created_at')
-    return JsonResponse({'status': 'success', 'notes': list(notes)})
-
 
 def get_messages(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
@@ -777,9 +768,6 @@ def get_course_career_guidance_json(request, course_id):
     guidance_messages = CareerGuidanceMessage.objects.filter(course=course).values('content')
     return JsonResponse({'guidance_messages': list(guidance_messages)})
 
-
-
-# views.py
 
 def get_course_details(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
@@ -978,3 +966,36 @@ def dislike_comment(request, comment_id):
     comment.dislikes += 1
     comment.save()
     return JsonResponse({'dislikes': comment.dislikes})
+
+
+@login_required
+def get_notes(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    student = get_object_or_404(Student, user=request.user)
+    notes = Note.objects.filter(course=course, student=student).values('content', 'created_at')
+
+    # Render the HTML template and pass notes data as context
+    return render(request, 'start_course.html', {'notes': notes})
+
+
+@login_required
+def save_note(request, course_id):
+    if request.method == 'POST':
+        try:
+            course = Course.objects.get(id=course_id)
+            student = Student.objects.get(user=request.user)
+            data = json.loads(request.body)
+            content = data.get('content')
+
+            if content:
+                note = Note.objects.create(course=course, student=student, content=content)
+                return JsonResponse({'status': 'success', 'note_id': note.id})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Content is required'})
+        except Course.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Course not found'})
+        except Student.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Student not found'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
