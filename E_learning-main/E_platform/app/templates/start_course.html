@@ -174,8 +174,13 @@
     </table>
 </div>
 
-        
-            <!-- Notes Section -->
+
+
+
+
+
+
+                        <!-- Notes Section -->
             <div id="notes" class="content-section hidden">
                 <h2>Notes</h2>
                 <textarea id="note-content" class="form-control" rows="5"></textarea>
@@ -184,8 +189,6 @@
                     <!-- Notes will be appended here -->
                 </div>
             </div>
-
-
 
             <!-- Discussions Section -->
             <div id="discussions" class="content-section hidden">
@@ -198,30 +201,36 @@
                 <a href="/create_post/{{ course.id }}">Create Post</a>
               </div>
 
-                <br><br>
-
-
             <div class="forum-topics">
                 <h2>Common discussion forum</h2>
                 <p><a>Where ideas meet and grow</a>   (1432 Threads) <a href="/community" class="join-button">Join Now</a></p>
 
               </div>
 
-
-
                 {% for week in course.weeks.all %}
-    <div class="card mt-4" id="week-{{ week.id }}">
-        <div class="card-header">
-            <h3>Week {{ week.number }}: {{ week.title }}</h3>
-            <p><a href="#">Discuss this weeks modules here.</a> (152 Threads)</p>
-                <p>Last post a day ago</p>
-        </div>
-            {% endfor %}
-    </div>
-
-
+                    <div class="card mt-4" id="week-{{ week.id }}">
+                        <div class="card-header">
+                            <h3>Week {{ week.number }}: {{ week.title }}</h3>
+                            <p><a href="#">Discuss this weeks modules here.</a> (152 Threads)</p>
+                                <p>Last post a day ago</p>
+                        </div>
+                            {% endfor %}
+                    </div>
             </div>
+        </div>
 
+
+
+
+
+<!-- Career Section -->
+<div id="career_guidance" class="content-section hidden">
+    <h2>Career Guidance</h2>
+    <ul id="career-guidance-list">
+        <!-- Career guidance messages will be appended here by JavaScript -->
+    </ul>
+    <p id="no-career-guidance" class="hidden">No career guidance available.</p>
+</div>
 
 
 
@@ -234,7 +243,6 @@
                 </ul>
                 <p id="no-messages" class="hidden">No messages available.</p>
             </div>
-
 
 
             <div id="resources" class="content-section hidden">
@@ -255,7 +263,6 @@
 
 
 
-
             <div id="course_info" class="content-section hidden">
                 <h2>Course Info</h2>
             <h2>{{ course.title }}</h2>
@@ -272,18 +279,32 @@
             <br>
             </div>
 
-            <div id="career_guidance" class="content-section hidden">
-            <h2>Career Guidance</h2>
-            <ul id="career-guidance-list">
-                <!-- Career guidance messages will be appended here by JavaScript -->
-            </ul>
-            <p id="no-career-guidance" class="hidden">No career guidance available.</p>
-            </div>
 
+        <div id="qp" class="content-section hidden">
+                <h1>Question Papers</h1>
 
-            <div id="qp" class="content-section hidden">
-                <h2>Question Paper</h2>
+                <!-- Grade Filter Buttons -->
+                <div>
+                    <h2>Select Grade:</h2>
+                    <div>
+                        <a href="{% url 'question_papers' %}" class="grade-button {% if not selected_grade %}active{% endif %}">All Grades</a>
+                        {% for grade in grades %}
+                            <a href="{% url 'question_papers' %}?grade={{ grade }}{% if selected_year %}&year={{ selected_year }}{% endif %}" class="grade-button {% if selected_grade|default:'' == grade|stringformat:"s" %}active{% endif %}">Grade {{ grade }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
 
+                <!-- Display Question Papers -->
+                <ul>
+                    {% for paper in question_papers %}
+                        <li>
+                            <a href="{% url 'view_question_paper' paper.id %}" target="_blank">{{ paper.title }} - {{ paper.subject }} ({{ paper.year }})</a>
+                            | <a href="{% url 'download_question_paper' paper.id %}" download>Download PDF</a>
+                        </li>
+                    {% empty %}
+                        <li>No question papers available for the selected criteria.</li>
+                    {% endfor %}
+                </ul>
             </div>
 
 
@@ -339,184 +360,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-        $(document).ready(function() {
-            // Function to show the correct section based on the sidebar link clicked
-            $('.list-group-item').click(function() {
-                var section = $(this).data('section');
-                $('.content-section').addClass('hidden');
-                $('#' + section).removeClass('hidden');
-            });
-        
-            // Save note via AJAX
-            $('#save-note').click(function() {
-                var content = $('#note-content').val();
-                var courseId = {{ course.id }};
-                $.ajax({
-                    url: '/courses/' + courseId + '/add_note/',
-                    method: 'POST',
-                    data: {
-                        content: content,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            $('#note-content').val('');
-                            loadNotes();
-                        } else {
-                            alert('Error saving note.');
-                        }
-                    }
-                });
-            });
-        
-            // Load notes via AJAX
-            function loadNotes() {
-                var courseId = {{ course.id }};
-                $.ajax({
-                    url: '/courses/' + courseId + '/get_notes/',
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            var notesList = $('#notes-list');
-                            notesList.empty();
-                            response.notes.forEach(function(note) {
-                                notesList.append('<div class="note"><p>' + note.content + '</p><small>' + note.created_at + '</small></div>');
-                            });
-                        } else {
-                            alert('Error loading notes.');
-                        }
-                    }
-                });
-            }
-        
-            // Load notes on page load
-            loadNotes();
-        });
-        
-        function showTopics(weekId) {
-            document.querySelectorAll('.topics-list').forEach(function(list) {
-                list.style.display = 'none';
-            });
-            document.getElementById('topics-' + weekId).style.display = 'block';
-        }
-        
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(function(content) {
-                content.classList.remove('active');
-            });
-            document.getElementById(tabName).classList.add('active');
-        }
-
-
-
-
-
-
-
-
-
-
-            $(document).ready(function() {
-    // Function to show the correct section based on the sidebar link clicked
-    $('.list-group-item').click(function() {
-        var section = $(this).data('section');
-        $('.content-section').addClass('hidden');
-        $('#' + section).removeClass('hidden');
-    });
-
-    // Save note via AJAX
-    $('#save-note').click(function() {
-        var content = $('#note-content').val();
-        var courseId = {{ course.id }};
-        $.ajax({
-            url: '/courses/' + courseId + '/add_note/',
-            method: 'POST',
-            data: {
-                content: content,
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    $('#note-content').val('');
-                    loadNotes();
-                } else {
-                    alert('Error saving note.');
-                }
-            }
-        });
-    });
-
-    // Load notes via AJAX
-    function loadNotes() {
-        var courseId = {{ course.id }};
-        $.ajax({
-            url: '/courses/' + courseId + '/get_notes/',
-            method: 'GET',
-            success: function(response) {
-                if (response.status === 'success') {
-                    var notesList = $('#notes-list');
-                    notesList.empty();
-                    response.notes.forEach(function(note) {
-                        notesList.append('<div class="note"><p>' + note.content + '</p><small>' + note.created_at + '</small></div>');
-                    });
-                } else {
-                    alert('Error loading notes.');
-                }
-            }
-        });
-    }
-
-    // Load notes on page load
-    loadNotes();
-});
-
-
-
+// JavaScript code
 $(document).ready(function() {
-    // Function to show the correct section based on the sidebar link clicked
-    $('.list-group-item').click(function() {
-        var section = $(this).data('section');
-        $('.content-section').addClass('hidden');
-        $('#' + section).removeClass('hidden');
-
-        if (section === 'messages') {
-            loadMessages();
-        }
-    });
-
-    // Function to load messages via AJAX
-    function loadMessages() {
-        var courseId = {{ course.id }};
-        $.ajax({
-            url: '/courses/' + courseId + '/messages/json/',
-            method: 'GET',
-            success: function(response) {
-                var messagesList = $('#messages-list');
-                var noMessages = $('#no-messages');
-                messagesList.empty();  // Clear the existing messages
-
-                if (response.messages.length > 0) {
-                    response.messages.forEach(function(message) {
-                        messagesList.append('<li>' + message.content + '</li>');
-                    });
-                    noMessages.addClass('hidden');
-                } else {
-                    noMessages.removeClass('hidden');
-                }
-            },
-            error: function() {
-                alert('Error loading messages.');
-            }
-        });
-    }
-});
-
-
-
-
-
-
-    $(document).ready(function() {
     // Function to show the correct section based on the sidebar link clicked
     $('.list-group-item').click(function() {
         var section = $(this).data('section');
@@ -527,8 +372,43 @@ $(document).ready(function() {
             loadMessages();
         } else if (section === 'career_guidance') {
             loadCareerGuidance();
+        } else if (section === 'resources') {
+            loadResources();
+        } else if (section === 'discussions') {
+            loadDiscussions();
         }
     });
+
+    // Function to load career guidance via AJAX
+    function loadCareerGuidance() {
+        var courseId = {{ course.id }};
+        $.ajax({
+            url: '/courses/' + courseId + '/career_guidance/json/',
+            method: 'GET',
+            success: function(response) {
+                var careerGuidanceList = $('#career-guidance-list');
+                var noCareerGuidance = $('#no-career-guidance');
+                careerGuidanceList.empty();  // Clear the existing career guidance
+
+                if (response.guidance_messages.length > 0) {
+                    response.guidance_messages.forEach(function(guidance) {
+                        careerGuidanceList.append('<li>' + guidance.content + '</li>');
+                    });
+                    noCareerGuidance.addClass('hidden');
+                } else {
+                    noCareerGuidance.removeClass('hidden');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                console.error('Status:', status);
+                console.error('Response:', xhr.responseText);
+                alert('Error loading career guidance: ' + error);
+            }
+        });
+    }
+
+
 
     // Function to load messages via AJAX
     function loadMessages() {
@@ -556,32 +436,6 @@ $(document).ready(function() {
         });
     }
 
-    // Function to load career guidance messages via AJAX
-    function loadCareerGuidance() {
-        var courseId = {{ course.id }};
-        $.ajax({
-            url: '/courses/' + courseId + '/career_guidance/json/',
-            method: 'GET',
-            success: function(response) {
-                var guidanceList = $('#career-guidance-list');
-                var noGuidance = $('#no-career-guidance');
-                guidanceList.empty();  // Clear the existing guidance messages
-
-                if (response.guidance_messages.length > 0) {
-                    response.guidance_messages.forEach(function(message) {
-                        guidanceList.append('<li>' + message.content + '</li>');
-                    });
-                    noGuidance.addClass('hidden');
-                } else {
-                    noGuidance.removeClass('hidden');
-                }
-            },
-            error: function() {
-                alert('Error loading career guidance.');
-            }
-        });
-    }
-});
 
 
 
@@ -589,19 +443,6 @@ $(document).ready(function() {
 
 
 
-// JavaScript code
-// JavaScript code
-$(document).ready(function() {
-    // Function to show the correct section based on the sidebar link clicked
-    $('.list-group-item').click(function() {
-        var section = $(this).data('section');
-        $('.content-section').addClass('hidden');
-        $('#' + section).removeClass('hidden');
-
-        if (section === 'resources') {
-            loadResources();
-        }
-    });
 
     // Function to load resources via AJAX
     function loadResources() {
@@ -633,53 +474,6 @@ $(document).ready(function() {
             }
         });
     }
-});
-
-
-
-
-$(document).ready(function() {
-    $('.list-group-item').click(function() {
-        var section = $(this).data('section');
-        $('.content-section').addClass('hidden');
-        $('#' + section).removeClass('hidden');
-
-        if (section === 'messages') {
-            loadMessages();
-        }
-    });
-
-    $('.toggle-like').click(function() {
-        var postId = $(this).data('post-id');
-        var button = $(this);
-        $.ajax({
-            url: '/posts/' + postId + '/toggle_like/',
-            method: 'POST',
-            data: {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function(response) {
-                button.text('👍 ' + response.likes_count + ' Like');
-            }
-        });
-    });
-});
-
-
-
-
-
-$(document).ready(function() {
-    // Function to show the correct section based on the sidebar link clicked
-    $('.list-group-item').click(function() {
-        var section = $(this).data('section');
-        $('.content-section').addClass('hidden');
-        $('#' + section).removeClass('hidden');
-
-        if (section === 'discussions') {
-            loadDiscussions();
-        }
-    });
 
     // Function to load discussions via AJAX
     function loadDiscussions() {
@@ -736,8 +530,23 @@ $(document).ready(function() {
     if ($('#discussions').is(':visible')) {
         loadDiscussions();
     }
-});
 
+    // Function to toggle like
+    $('.toggle-like').click(function() {
+        var postId = $(this).data('post-id');
+        var button = $(this);
+        $.ajax({
+            url: '/posts/' + postId + '/toggle_like/',
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                button.text('👍 ' + response.likes_count + ' Like');
+            }
+        });
+    });
+});
 
 
 

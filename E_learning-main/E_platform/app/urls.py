@@ -41,9 +41,11 @@ urlpatterns = [
 
     path('courses/<int:course_id>/add-note/', add_note, name='add_note'),
     path('courses/<int:course_id>/get-notes/', get_notes, name='get_notes'),
-    path('courses/<int:course_id>/messages/', get_messages, name='course_messages'),
+    path('courses/<int:course_id>/messages/', get_messages, name='get_messages'),
     path('courses/<int:course_id>/messages/json/', get_course_messages_json, name='get_course_messages_json'),
-    path('courses/<int:course_id>/career-guidance/json/', get_career_guidance_json, name='get_career_guidance_json'),
+    path('courses/<int:course_id>/career-guidance/', get_career_guidance, name='get_career_guidance'),
+    path('courses/<int:course_id>/career_guidance/json/', get_course_career_guidance_json, name='course_career_guidance_json'),
+
     path('courses/<int:course_id>/resources/json/', get_course_resources_json, name='get_course_resources_json'),
     path('courses/<int:course_id>/discussions/json/', get_discussions, name='get_discussions'),
     path('courses/<int:course_id>/add-discussion/', add_discussion, name='add_discussion'),
@@ -73,11 +75,12 @@ urlpatterns = [
 
     path('community/',community_platform, name='community_platform'),
     path('community/add_post/',add_post, name='add_post'),
-    path('community/add_comment/<int:post_id>/',add_comment, name='add_comment'),
+    path('community/add_comment/<int:post_id>/', add_comment, name='add_comment'),
 
     path('like_post/<int:post_id>/',like_post, name='like_post'),
     path('dislike_post/<int:post_id>/',dislike_post, name='dislike_post'),
     path('like_comment/<int:comment_id>/', like_comment, name='like_comment'),
     path('dislike_comment/<int:comment_id>/', dislike_comment, name='dislike_comment'),
+
 
 ]

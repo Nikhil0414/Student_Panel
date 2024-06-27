@@ -17,6 +17,8 @@ from django.utils import timezone
 from django.urls import reverse
 from .models import BlogPost
 from .forms import BlogPostForm, BlogCommentForm
+from django.http import JsonResponse
+from .models import Course, Message
 
 
 # Create your views here.
@@ -473,6 +475,7 @@ def previous_question_papers(request, course_id):
 razorpay_client = razorpay.Client(
     auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
 
+
 @csrf_exempt
 def paymenthandler(request):
     # only accept POST request.
@@ -756,14 +759,24 @@ def get_messages(request, course_id):
 
 def get_course_messages_json(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    messages = Message.objects.filter(course=course).values('content')
-    return JsonResponse({'messages': list(messages)})
+    course_messages = Message.objects.filter(course=course).values('content')
+    return JsonResponse({'messages': list(course_messages)})
+
+def get_career_guidance(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    course_career_guidance = CareerGuidanceMessage.objects.filter(course=course)
+    context = {
+        'course': course,
+        'career_guidance': course_career_guidance,
+    }
+    return render(request, 'start_course.html', context)
 
 
-def get_career_guidance_json(request, course_id):
+def get_course_career_guidance_json(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     guidance_messages = CareerGuidanceMessage.objects.filter(course=course).values('content')
     return JsonResponse({'guidance_messages': list(guidance_messages)})
+
 
 
 # views.py
@@ -812,7 +825,6 @@ def blog_detail(request, post_id):
     return render(request, 'blog_detail.html', {'post': post, 'comments': comments, 'comment_form': comment_form})
 
 
-
 @login_required
 def blog_create(request):
     if request.method == 'POST':
@@ -826,7 +838,6 @@ def blog_create(request):
     return render(request, 'blog_form.html', {'form': form})
 
 
-
 @login_required
 def blog_update(request, post_id):
     post = get_object_or_404(BlogPost, id=post_id)
@@ -838,7 +849,6 @@ def blog_update(request, post_id):
     else:
         form = BlogPostForm(instance=post)
     return render(request, 'blog_form.html', {'form': form})
-
 
 
 @login_required
@@ -860,6 +870,7 @@ def get_discussions(request, course_id):
         'created_at': discussion.created_at.strftime('%Y-%m-%d %H:%M:%S')
     } for discussion in discussions]
     return JsonResponse({'status': 'success', 'discussions': discussions_data})
+
 
 @csrf_exempt
 def add_discussion(request, course_id):
@@ -911,8 +922,6 @@ def create_post(request, course_id):
         'weeks': weeks,
     }
     return render(request, 'create_post.html', context)
-
-
 
 
 @login_required
@@ -969,5 +978,3 @@ def dislike_comment(request, comment_id):
     comment.dislikes += 1
     comment.save()
     return JsonResponse({'dislikes': comment.dislikes})
-
-

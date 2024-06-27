@@ -318,12 +318,12 @@ class Message(models.Model):
 
 
 class CareerGuidanceMessage(models.Model):
-    course = models.ForeignKey(Course, related_name='career_guidance_messages', on_delete=models.CASCADE, null=True,
-                               blank=True)
+    course = models.ForeignKey(Course, related_name='guidance_messages', on_delete=models.CASCADE, null=True, blank=True)
     content = models.TextField()
 
     def __str__(self):
-        return f"Career Guidance for {self.course.title}"
+        return f"Career Guidance for {self.course.title if self.course else 'No Course'}"
+
 
 
 # models.py
@@ -365,7 +365,8 @@ class BlogComment(models.Model):
 class Discussion(models.Model):
     course = models.ForeignKey(Course, related_name='discussions', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True, blank=True)
-    user = models.ForeignKey(get_user_model(), related_name='discussions', on_delete=models.CASCADE, null=True, blank=True)  # Added user field
+    user = models.ForeignKey(get_user_model(), related_name='discussions', on_delete=models.CASCADE, null=True,
+                             blank=True)  # Added user field
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -381,8 +382,6 @@ class MentorshipRequest(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.email} - Course: {self.course.title}"
-
-
 
 
 class Post(models.Model):
