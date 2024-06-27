@@ -52,6 +52,7 @@ urlpatterns = [
 
     path('certificate/', certificate, name='certificates'),
     path('download-certificate/<int:certificate_id>/', download_certificate, name='download_certificate'),
+
     path('my-courses/', all_course_progress, name='my-courses'),
     path('question-papers/', question_papers, name='question_papers'),
     path('question-paper/<int:pk>/', view_question_paper, name='view_question_paper'),
@@ -67,11 +68,6 @@ urlpatterns = [
     path('blog/<int:post_id>/delete/', blog_delete, name='blog_delete'),
 
     path('mentorship/', mentorship_form, name='mentorship_form'),
-
-    path('create_post/<int:course_id>/', create_post, name='create_post'),
-
-
-
 
     path('community/',community_platform, name='community_platform'),
     path('community/add_post/',add_post, name='add_post'),

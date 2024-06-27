@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Certificates</title>
-  </head>
-  <body>
+</head>
+<body>
     <h1>Certificates</h1>
 
     {% if courses_with_certificates %}
-    <h1>Your Certificates and Grades</h1>
+    <h2>Your Certificates and Grades</h2>
     <ul>
         {% for course, details in courses_with_certificates.items %}
-          <li>
-            <h2>{{ course.title }}</h2>
+        <li>
+            <h3>{{ course.title }}</h3>
             <p>Certificate issued on: {{ details.certificate.completion_date }}</p>
             <p>Grade: {{ details.grade }}</p>
-            <p><a href="{% url 'download-certificate' details.certificate.id %}" class="btn btn-primary">Download Certificate</a></p>
+            <p><a href="{% url 'download_certificate' details.certificate.id %}" class="btn btn-primary">Download Certificate</a></p>
             <div>
                 <span>Share:</span>
                 <!-- Replace '#' with actual URLs for sharing -->
@@ -24,11 +24,11 @@
                 <a href="https://twitter.com/intent/tweet?url=#&text=Check out my certificate from {{ course.title }}!&hashtags=certificate,{{ course.title }}" target="_blank">Twitter</a>
                 <a href="https://www.linkedin.com/shareArticle?url=#&title=Certificate from {{ course.title }}" target="_blank">LinkedIn</a>
             </div>
-          </li>
+        </li>
         {% endfor %}
-      </ul>
+    </ul>
     {% else %}
     <p>No certificates found.</p>
     {% endif %}
-  </body>
+</body>
 </html>

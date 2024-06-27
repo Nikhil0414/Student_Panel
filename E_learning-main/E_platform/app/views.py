@@ -249,7 +249,8 @@ def calculate_grade_from_score(score):
 
 @login_required
 def download_certificate(request, certificate_id):
-    certificate = get_object_or_404(Certificate, id=certificate_id, user__user=request.user)
+    certificate = get_object_or_404(Certificate, id=certificate_id, user=request.user.student)
+
     if not certificate.certificate_image:
         raise Http404("Certificate image not found")
 
@@ -257,16 +258,15 @@ def download_certificate(request, certificate_id):
     file_path = certificate.certificate_image.path
     with open(file_path, 'rb') as f:
         response = HttpResponse(f.read(), content_type='image/jpeg')
-        response[
-            'Content-Disposition'] = f'attachment; filename="{certificate.user.Full_Name} certificate {certificate.course.title}.jpg"'
+        response['Content-Disposition'] = f'attachment; filename="{certificate.user.Full_Name} certificate {certificate.course.title}.jpg"'
         return response
-
 
 @login_required
 def certificate(request):
     user = Student.objects.get(user=request.user)
 
     # Calculate grades for the student
+    # Assuming calculate_grade_for_student is defined elsewhere
     calculate_grade_for_student(user)
 
     certificates = Certificate.objects.filter(user=user)
@@ -281,8 +281,6 @@ def certificate(request):
         }
 
     return render(request, 'certificates.html', {'courses_with_certificates': courses_with_certificates})
-
-
 # ---------------------------------------------------------------------------
 # Login view
 # ---------------------------------------------------------------------------
