@@ -36,8 +36,14 @@ admin.site.register(BlogComment)
 admin.site.register(Certificate)
 admin.site.register(Discussion)
 
-admin.site.register(Post)  # Register the Post model
-admin.site.register(Comment)  # Register the Comment model
+admin.site.register(Post)
+admin.site.register(Comment)
+
+admin.site.register(WeekPost)
+admin.site.register(WeekComment)
+
+
+
 
 
 class QuestionInline(admin.TabularInline):

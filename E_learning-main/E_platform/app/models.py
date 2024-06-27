@@ -396,3 +396,25 @@ class Comment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     likes = models.IntegerField(default=0)
     dislikes = models.IntegerField(default=0)
+
+
+class WeekPost(models.Model):
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
+    week_number = models.IntegerField(Week, null=True, blank=True)
+
+
+class WeekComment(models.Model):
+    week_post = models.ForeignKey(WeekPost, on_delete=models.CASCADE)
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
+
+
+
+

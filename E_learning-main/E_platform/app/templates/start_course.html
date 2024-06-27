@@ -198,7 +198,7 @@
               <div class="forum-search">
                 <input type="text" placeholder="Search forum">
                 <button>Search</button>
-                <a href="/create_post/{{ course.id }}">Create Post</a>
+                  <br><br><br>
               </div>
 
             <div class="forum-topics">
@@ -211,7 +211,7 @@
                     <div class="card mt-4" id="week-{{ week.id }}">
                         <div class="card-header">
                             <h3>Week {{ week.number }}: {{ week.title }}</h3>
-                            <p><a href="#">Discuss this weeks modules here.</a> (152 Threads)</p>
+                            <p><a href="/weekly_platform/{{week.id}}">Discuss this weeks modules here.</a> (152 Threads)</p>
                                 <p>Last post a day ago</p>
                         </div>
                             {% endfor %}

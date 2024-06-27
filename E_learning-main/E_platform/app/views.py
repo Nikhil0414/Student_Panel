@@ -999,3 +999,54 @@ def save_note(request, course_id):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
+
+
+@login_required
+def weekly_platform(request, week_number):
+    # Retrieve week posts for a specific week
+    week_posts = WeekPost.objects.filter(week_number=week_number)
+    return render(request, 'weekly_platform.html', {'week_posts': week_posts, 'week_number': week_number})
+
+@login_required
+def add_week_post(request, week_number):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        user = request.user.student
+        week_post = WeekPost.objects.create(user=user, content=content, week_number=week_number)
+        return redirect('weekly_platform', week_number=week_number)
+    return render(request, 'add_week_post.html', {'week_number': week_number})
+
+@login_required
+def add_week_comment(request, week_number, week_post_id):
+    week_post = get_object_or_404(WeekPost, pk=week_post_id)
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        user = request.user.student
+        comment = WeekComment.objects.create(week_post=week_post, user=user, content=content)
+        return redirect('weekly_platform', week_number=week_number)
+    return render(request, 'add_week_comment.html', {'week_post': week_post, 'week_number': week_number})
+
+
+def like_week_post(request, week_post_id):
+    week_post = get_object_or_404(WeekPost, pk=week_post_id)
+    week_post.likes += 1
+    week_post.save()
+    return JsonResponse({'likes': week_post.likes})
+
+def dislike_week_post(request, week_post_id):
+    week_post = get_object_or_404(WeekPost, pk=week_post_id)
+    week_post.dislikes += 1
+    week_post.save()
+    return JsonResponse({'dislikes': week_post.dislikes})
+
+def like_week_comment(request, week_comment_id):
+    week_comment = get_object_or_404(WeekComment, pk=week_comment_id)
+    week_comment.likes += 1
+    week_comment.save()
+    return JsonResponse({'likes': week_comment.likes})
+
+def dislike_week_comment(request, week_comment_id):
+    week_comment = get_object_or_404(WeekComment, pk=week_comment_id)
+    week_comment.dislikes += 1
+    week_comment.save()
+    return JsonResponse({'dislikes': week_comment.dislikes})

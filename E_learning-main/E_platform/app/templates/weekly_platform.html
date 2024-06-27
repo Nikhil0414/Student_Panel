@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .week-post {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        .week-post p {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .week-post small {
+            font-size: 12px;
+            color: #666;
+        }
+        .week-comment-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .week-comment-list li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            list-style: none;
+        }
+        .week-comment-form {
+            margin-top: 10px;
+        }
+        .week-comment-form textarea {
+            width: calc(100% - 90px); /* Adjusted to match button width */
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            resize: vertical;
+            font-size: 14px;
+        }
+        .week-comment-form button {
+            width: 80px;
+            padding: 8px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px; /* Added margin for spacing */
+        }
+        .week-post-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            resize: vertical;
+            font-size: 16px;
+            margin-bottom: 10px; /* Added margin for spacing */
+        }
+        .week-post-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">E-Learning</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'course_catalog' %}">Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'enrolled_course' %}">Enrolled Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Community</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'view_cart' %}">Cart</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'wishlist' %}">Wishlist</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'support' %}">Support</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'referrals' %}">Referrals</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Profile
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'update_profile' %}">Update</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+            <h2>Weekly Platform</h2>
+    <!-- Week post list -->
+    {% for week_post in week_posts %}
+    <div class="week-post">
+        <p>{{ week_post.content }}</p>
+        <small>Posted by {{ week_post.user }} on {{ week_post.timestamp }}</small>
+        <!-- Like and dislike buttons for week post -->
+        <button onclick="likeWeekPost({{ week_post.id }})" class="btn btn-primary btn-sm">Like <span id="week-post-like-count-{{ week_post.id }}">{{ week_post.likes }}</span></button>
+        <button onclick="dislikeWeekPost({{ week_post.id }})" class="btn btn-danger btn-sm">Dislike <span id="week-post-dislike-count-{{ week_post.id }}">{{ week_post.dislikes }}</span></button>
+
+        <!-- Week comment list -->
+        <ul class="week-comment-list">
+            {% for week_comment in week_post.weekcomment_set.all %}
+            <li>
+                {{ week_comment.content }} - {{ week_comment.user }} - {{ week_comment.timestamp }}
+                <!-- Like and dislike buttons for week comment -->
+                <button onclick="likeWeekComment({{ week_comment.id }})" class="btn btn-primary btn-sm">Like <span id="week-comment-like-count-{{ week_comment.id }}">{{ week_comment.likes }}</span></button>
+                <button onclick="dislikeWeekComment({{ week_comment.id }})" class="btn btn-danger btn-sm">Dislike <span id="week-comment-dislike-count-{{ week_comment.id }}">{{ week_comment.dislikes }}</span></button>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Week comment form -->
+        <form class="week-comment-form" method="POST" action="{% url 'add_week_comment' week_number week_post.id %}">
+            {% csrf_token %}
+            <textarea name="content" rows="2" placeholder="Add your comment"></textarea>
+            <button type="submit">Comment</button>
+        </form>
+    </div>
+    {% endfor %}
+
+    <!-- Week post form -->
+    <form class="week-post-form" method="POST" action="{% url 'add_week_post' week_number %}">
+        {% csrf_token %}
+        <textarea name="content" rows="4" placeholder="Write your week post here"></textarea><br>
+        <button type="submit">Post</button>
+    </form>
+</div>
+
+
+
+<!-- JavaScript for like/dislike functionality -->
+
+<script>
+    function likeWeekPost(postId) {
+        // Send AJAX request to like endpoint
+        fetch(`/like_week_post/${postId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Update like count
+                document.getElementById(`week-post-like-count-${postId}`).innerText = data.likes;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function dislikeWeekPost(postId) {
+        // Send AJAX request to dislike endpoint
+        fetch(`/dislike_week_post/${postId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Update dislike count
+                document.getElementById(`week-post-dislike-count-${postId}`).innerText = data.dislikes;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function likeWeekComment(commentId) {
+        // Send AJAX request to like endpoint
+        fetch(`/like_week_comment/${commentId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Update like count
+                document.getElementById(`week-comment-like-count-${commentId}`).innerText = data.likes;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function dislikeWeekComment(commentId) {
+        // Send AJAX request to dislike endpoint
+        fetch(`/dislike_week_comment/${commentId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Update dislike count
+                document.getElementById(`week-comment-dislike-count-${commentId}`).innerText = data.dislikes;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+
+
+
+
+</body>
+</html>

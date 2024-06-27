@@ -84,4 +84,15 @@ urlpatterns = [
 
     path('get_notes/<int:course_id>/', get_notes, name='get_notes'),
     path('save_note/<int:course_id>/', save_note, name='save_note'),
+
+
+    path('weekly_platform/<int:week_number>/', weekly_platform, name='weekly_platform'),
+    path('weekly_platform/add_week_post/<int:week_number>/', add_week_post, name='add_week_post'),
+    path('weekly_platform/add_week_comment/<int:week_number>/<int:week_post_id>/', add_week_comment, name='add_week_comment'),
+
+    path('like_week_post/<int:week_post_id>/', like_week_post, name='like_week_post'),
+    path('dislike_week_post/<int:week_post_id>/', dislike_week_post, name='dislike_week_post'),
+    path('like_week_comment/<int:week_comment_id>/', like_week_comment, name='like_week_comment'),
+    path('dislike_week_comment/<int:week_comment_id>/', dislike_week_comment, name='dislike_week_comment'),
+
 ]
