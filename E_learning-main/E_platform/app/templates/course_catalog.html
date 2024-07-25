@@ -4,6 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Catalog</title>
+    <style>
+
+        /* Custom styles for the program section */
+            .program-card {
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease;
+            }
+
+            .program-card:hover {
+                transform: scale(1.05);
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .card-text {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .card-price {
+                font-size: 1.25rem;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+
+            .card-note {
+                font-size: 0.875rem;
+                color: #666;
+                margin-bottom: 1rem;
+            }
+
+            ul.list-unstyled li {
+                margin-bottom: 0.5rem;
+            }
+
+            .btn-primary, .btn-success, .btn-info {
+                border-radius: 20px;
+                padding: 0.5rem 1rem;
+            }
+    </style>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -34,6 +80,9 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'referrals' %}">Referrals</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'certificate' %}">Certificates</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'blog_list' %}">Blogs</a>
@@ -127,10 +176,71 @@
 <br>
     <br>
     <br>
-    <br>
-    <br>
-    <br>
 
+    <!-- Enhanced Program Section -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Choose the Program That Fits Your Goals</h2>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="program-card card border-primary">
+                <div class="card-body">
+                    <h3 class="card-title">Single Learning Program</h3>
+                    <p class="card-text">Learn specialized courses at your own pace.</p>
+                    <p class="card-price">₹4,087</p>
+                    <p class="card-note">Cancel anytime. Earn a certification upon completion.</p>
+                    <ul class="list-unstyled">
+                        <li>Data Science & Machine Learning course</li>
+                    </ul>
+                    <a href="{% url 'bundle_detail' bundle_id=1 %}" class="btn btn-primary">Explore</a> <!-- Change `bundle_id` accordingly -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="program-card card border-success">
+                <div class="card-body">
+                    <h3 class="card-title">E-Learning Plus</h3>
+                    <p class="card-text">Complete multiple courses in a short term.</p>
+                    <p class="card-price">₹4,087 - ₹6,509</p>
+                    <p class="card-note">Cancel anytime. Earn unlimited certificates.</p>
+                    <ul class="list-unstyled">
+                        <li>HTML/CSS</li>
+                        <li>JavaScript</li>
+                        <li>Bootstrap</li>
+                        <li>React JS</li>
+                        <li>Angular JS</li>
+                    </ul>
+                    <a href="{% url 'bundle_detail' bundle_id=2 %}" class="btn btn-success">Explore</a> <!-- Change `bundle_id` accordingly -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="program-card card border-info">
+                <div class="card-body">
+                    <h3 class="card-title">Learning Program</h3>
+                    <p class="card-text">Specialized courses tailored for your career.</p>
+                    <p class="card-price">₹5,087</p>
+                    <p class="card-note">Cancel anytime. Earn a certification upon completion.</p>
+                    <ul class="list-unstyled">
+                        <li>DevOps Practices and Tools</li>
+                        <li>Microsoft Azure</li>
+                    </ul>
+                    <a href="{% url 'bundle_detail' bundle_id=3 %}" class="btn btn-info">Explore</a> <!-- Change `bundle_id` accordingly -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
 </div>
 
 

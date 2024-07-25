@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ bundle.title }}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .bundle-card, .course-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .bundle-card img, .course-card img {
+            width: 100%;
+            height: auto;
+        }
+        .card-title {
+            font-size: 1.5rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .medium-img {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="bundle-card card">
+            <img src="{{ bundle.image.url }}" alt="{{ bundle.title }}" class="card-img-top medium-img">
+            <div class="card-body">
+                <h2 class="card-title">{{ bundle.title }}</h2>
+                <p class="card-text"><strong>Price:</strong> ₹{{ bundle.price }}</p>
+                <p class="card-text">{{ bundle.description }}</p>
+                <p class="card-text"><strong>Note:</strong> {{ bundle.note }}</p>
+
+                <h4>Included Courses:</h4>
+                <div class="row">
+                    {% for course in bundle.courses.all %}
+                        <div class="col-md-4 mb-3">
+                            <div class="course-card card border-primary">
+                                <img src="{{ course.image.url }}" class="card-img-top medium-img" alt="{{ course.title }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ course.title }}</h5>
+                                    <p class="card-text">{{ course.description }}</p>
+                                    <p class="card-text"><strong>Price: ₹{{ course.price }}</strong></p>
+                                    <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <a href="{% url 'course_catalog' %}" class="btn btn-primary mt-3">Back to Programs</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

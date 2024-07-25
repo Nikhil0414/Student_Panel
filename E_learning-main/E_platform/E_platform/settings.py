@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'ckeditor',
+    'ckeditor_uploader',
+
 ]
 
 MIDDLEWARE = [
@@ -139,3 +142,12 @@ EMAIL_HOST_PASSWORD = 'tozpjudjdopwinhb'  # Your email password
 
 RAZOR_KEY_ID = 'rzp_test_lXIRKxSmQdoVKL'
 RAZOR_KEY_SECRET = 'PmIZRR4HpicE9wsB54bZgK8d'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+}

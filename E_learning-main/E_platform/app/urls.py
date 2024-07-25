@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
 
 urlpatterns = [
@@ -50,7 +50,7 @@ urlpatterns = [
     path('courses/<int:course_id>/discussions/json/', get_discussions, name='get_discussions'),
     path('courses/<int:course_id>/add-discussion/', add_discussion, name='add_discussion'),
 
-    path('certificate/', certificate, name='certificates'),
+    path('certificate/', certificate, name='certificate'),
     path('download-certificate/<int:certificate_id>/', download_certificate, name='download_certificate'),
 
     path('my-courses/', all_course_progress, name='my-courses'),
@@ -90,5 +90,16 @@ urlpatterns = [
     path('dislike_week_post/<int:week_post_id>/', dislike_week_post, name='dislike_week_post'),
     path('like_week_comment/<int:week_comment_id>/', like_week_comment, name='like_week_comment'),
     path('dislike_week_comment/<int:week_comment_id>/', dislike_week_comment, name='dislike_week_comment'),
+
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+
+
+    path('support/', support_page, name='support_page'),
+    path('support/get_chat_history/', get_chat_history, name='get_chat_history'),
+    path('support/send_message/', send_message, name='send_message'),
+    path('support/send_admin_message/', send_admin_message, name='send_admin_message'),
+
+    path('bundle/<int:bundle_id>/', bundle_detail, name='bundle_detail'),
+    path('course/<int:course_id>/', view_course_details, name='course_detail'),
 
 ]

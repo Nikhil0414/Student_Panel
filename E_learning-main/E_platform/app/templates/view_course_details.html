@@ -82,18 +82,57 @@
             <p>{{ course.this_course_includes }}</p>
             <br>
 
-<!--            <h4>Course Content</h4>-->
-<!--            <br>-->
-<!--            <h4>Requirement</h4>-->
-<!--            <br>-->
-<!--            <h4>Instructor</h4>-->
-<!--            <br>-->
-<!--            <h4>Ratings</h4>-->
+            <h4>Course Content</h4>
+
+            <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+            <div id="accordion">
+                {% for week in course.weeks.all %}
+                <div class="card">
+                    <div class="card-header" id="heading{{ week.id }}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ week.id }}" aria-expanded="true" aria-controls="collapse{{ week.id }}">
+                                Week {{ week.number }}: {{ week.title }}
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapse{{ week.id }}" class="collapse" aria-labelledby="heading{{ week.id }}" data-parent="#accordion">
+                        <div class="card-body">
+                            <div class="card mt-3" id="week-{{ week.id }}-topics-count">
+                                <div class="card-header">
+                                    <h5>{{ week.topics.all|length }} Topics -- Duration 00:00 -- {{ quizzes.all|length }} No. of tests</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add this at the bottom of your file if not already included -->
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+            <br>
+            <h4>Requirement</h4>
+            <p>{{ course.requirement }}</p>
+            <br>
+            <h4>Instructor</h4>
+            <p>{{ course.instructor }}</p>
+            <br>
+
+<!--
+            <h4>Ratings</h4>
+-->
 
 
 
 
         </div>
+
         <div class="col-md-6">
             <!-- Course Video -->
             {% if course.demo_video %}
@@ -131,9 +170,8 @@
                 <br>
             </div>
             {% endif %}
-
-
         </div>
+
     </div>
 </div>
 

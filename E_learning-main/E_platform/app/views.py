@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404, redirect
 from .models import Course, Enrollment, QuestionPaper
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 import razorpay
 from django.conf import settings
@@ -281,6 +281,10 @@ def certificate(request):
         }
 
     return render(request, 'certificates.html', {'courses_with_certificates': courses_with_certificates})
+
+
+
+
 # ---------------------------------------------------------------------------
 # Login view
 # ---------------------------------------------------------------------------
@@ -770,9 +774,13 @@ def get_course_career_guidance_json(request, course_id):
 def get_course_details(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     weeks = Week.objects.filter(course=course)
+    related_courses = Course.objects.filter(category=course.category).exclude(id=course.id)[:1]  # Fetching 5 related courses
+
     context = {
         'course': course,
         'weeks': weeks,
+        'related_courses': related_courses,
+
     }
     return render(request, 'course_details.html', context)
 
@@ -1048,3 +1056,79 @@ def dislike_week_comment(request, week_comment_id):
     week_comment.dislikes += 1
     week_comment.save()
     return JsonResponse({'dislikes': week_comment.dislikes})
+
+
+
+@login_required
+def support_page(request):
+    return render(request, 'support.html')
+
+
+def get_chat_history(request):
+    if request.method == 'GET':
+        user = request.user
+
+        if user.is_authenticated:
+            if hasattr(user, 'student'):
+                student = user.student
+                chat_messages = ChatMessage.objects.filter(user=student).order_by('timestamp')
+            else:
+                chat_messages = ChatMessage.objects.filter(is_admin=True).order_by('timestamp')
+
+            # Serialize the chat messages
+            chat_history = []
+            for message in chat_messages:
+                chat_history.append({
+                    'user': message.user.user.email if message.user else 'Admin',
+                    'message': message.message,
+                    'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                    'is_admin': message.is_admin,
+                })
+
+            return JsonResponse({'status': 'success', 'chat_history': chat_history})
+
+        return JsonResponse({'status': 'error', 'message': 'User not authenticated'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+def send_message(request):
+    if request.method == 'POST':
+        user = request.user
+
+        # Check if the user is authenticated and is a Student
+        if user.is_authenticated and hasattr(user, 'student'):
+            student = user.student
+            message_content = request.POST.get('message')
+
+            if message_content:
+                message = ChatMessage(user=student, message=message_content, is_admin=user.user_type == 1)
+                message.save()
+                return JsonResponse({'status': 'success'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Message content is empty'})
+
+        return JsonResponse({'status': 'error', 'message': 'User is not a student or not authenticated'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
+def is_admin(user):
+    return user.is_superuser
+
+@login_required
+def send_admin_message(request):
+    if request.method == 'POST':
+        message = request.POST.get('message')
+        if message:
+            chat_message = ChatMessage.objects.create(
+                message=message,
+                is_admin=True
+            )
+            return JsonResponse({'status': 'success', 'message': 'Message sent'})
+        return JsonResponse({'status': 'error', 'message': 'Empty message'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
+def bundle_detail(request, bundle_id):
+    bundle = get_object_or_404(Bundle, id=bundle_id)
+    return render(request, 'bundle_detail.html', {'bundle': bundle})

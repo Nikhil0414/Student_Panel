@@ -47,70 +47,168 @@
     </div>
 </nav>
 
+<div class="container mt-5">
+    <h1 class="text-center">Support & Help</h1>
 
+    <div class="row mt-5">
+        <!-- New Ticket Section -->
+        <div class="col-md-6">
+            <h2>New Ticket</h2>
+            <form method="post" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="reason">Choose Question:</label>
+                    <select class="form-control" name="reason" id="reason">
+                        <option value="Payment Methods">Payment Methods</option>
+                        <option value="Refund a Course">Refund a Course</option>
+                        <option value="Troubleshoot Payment Failure">Troubleshoot Payment Failure</option>
+                        <option value="Download Course Resources">Download Course Resources</option>
+                        <option value="Enrollment">Enrollment</option>
+                        <option value="Grades & Assignments">Grades & Assignments</option>
+                        <option value="Video Library">Video Library</option>
+                        <option value="Trust & Safety">Trust & Safety</option>
+                        <option value="Find a missing course">Find a missing course</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea class="form-control" name="description" id="description" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="attachment">Attachment (supported files: png, jpeg, pdf, doc):</label>
+                    <input type="file" class="form-control-file" name="attachment" id="attachment">
+                </div>
+                <button type="submit" class="btn btn-primary">Raise Ticket</button>
+            </form>
+        </div>
 
+        <!-- Previous Tickets Section -->
+        <div class="col-md-6">
+            <h2>Previous Tickets</h2>
+            <ul class="list-group mt-3">
+                {% for ticket in tickets %}
+                <li class="list-group-item">
+                    <h5><strong>Reason:</strong> {{ ticket.reason }}</h5>
+                    <p><strong>Description:</strong> {{ ticket.description }}</p>
+                    <p><strong>Status:</strong> {{ ticket.status }}</p>
+                    <p><strong>Submitted on:</strong> {{ ticket.timestamp }}</p>
+                    {% if ticket.attachment %}
+                    <p><strong>Attachment:</strong> <a href="{{ ticket.attachment.url }}" class="btn btn-sm btn-info">Download</a></p>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 
-    <div class="container mt-5">
-        <h1 class="text-center">Support & Help</h1>
-        <br>
-        <br>
+    <br><br><br>
+    <h1 class="text-center">Chat Support</h1>
 
-        <div class="row mt-5">
-            <!-- New Ticket Section -->
-            <div class="col-md-6">
-                <h2>New Ticket</h2>
-                <form method="post" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="reason">Choose Question:</label>
-                        <select class="form-control" name="reason" id="reason">
-                            <option value="Payment Methods">Payment Methods</option>
-                            <option value="Refund a Course">Refund a Course</option>
-                            <option value="Troubleshoot Payment Failure">Troubleshoot Payment Failure</option>
-                            <option value="Download Course Resources">Download Course Resources</option>
-                            <option value="Enrollment">Enrollment</option>
-                            <option value="Grades & Assignments">Grades & Assignments</option>
-                            <option value="Video Library">Video Library</option>
-                            <option value="Trust & Safety">Trust & Safety</option>
-                            <option value="Find a missing course">Find a missing course</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description:</label>
-                        <textarea class="form-control" name="description" id="description" rows="4"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="attachment">Attachment (supported files: png, jpeg, pdf, doc):</label>
-                        <input type="file" class="form-control-file" name="attachment" id="attachment">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Raise Ticket</button>
-                </form>
-            </div>
+    <!-- Chat Interface -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Chat with Support</div>
+                <div class="card-body" id="chat-box" style="height: 300px; overflow-y: scroll;">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="card-footer">
+                    <form id="chat-form">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chat-input" placeholder="Type your message...">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        </div>
 
-            <!-- Previous Tickets Section -->
-            <div class="col-md-6">
-                <h2>Previous Tickets</h2>
-                <ul class="list-group mt-3">
-                    {% for ticket in tickets %}
-                    <li class="list-group-item">
-                        <h5><strong>Reason:</strong> {{ ticket.reason }}</h5>
-                        <p><strong>Description:</strong> {{ ticket.description }}</p>
-                        <p><strong>Status:</strong> {{ ticket.status }}</p>
-                        <p><strong>Submitted on:</strong> {{ ticket.timestamp }}</p>
-                        {% if ticket.attachment %}
-                        <p><strong>Attachment:</strong> <a href="{{ ticket.attachment.url }}" class="btn btn-sm btn-info">Download</a></p>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+    function loadChatHistory() {
+        $.get('{% url "get_chat_history" %}', function(data) {
+            if (data.status === 'success') {
+                $('#chat-box').empty();
+                data.chat_history.forEach(function(msg) {
+                    var messageClass = msg.is_admin ? 'alert alert-info' : 'alert alert-secondary';
+                    var user = msg.is_admin ? 'Admin' : msg.user;
+                    $('#chat-box').append(
+                        '<div class="'+ messageClass +'">' +
+                        '<strong>' + user + ': </strong>' + msg.message +
+                        '<br><small>' + new Date(msg.timestamp).toLocaleString() + '</small>' +
+                        '</div>'
+                    );
+                });
+                $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+            } else {
+                alert('Failed to load chat history: ' + data.message);
+            }
+        });
+    }
+
+    $('#chat-form').submit(function(event) {
+        event.preventDefault();
+        var message = $('#chat-input').val().trim();
+        if (message) {
+            $.post('{% url "send_message" %}', {
+                'message': message,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            }, function(data) {
+                if (data.status === 'success') {
+                    loadChatHistory();
+                    $('#chat-input').val('');
+                } else {
+                    alert('Failed to send message: ' + data.message);
+                }
+            });
+        }
+    });
+
+    {% if request.user.is_superuser %}
+    $('#admin-chat-form').submit(function(event) {
+        event.preventDefault();
+        var message = $('#admin-chat-input').val().trim();
+        if (message) {
+            $.post('{% url "send_admin_message" %}', {
+                'message': message,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            }, function(data) {
+                if (data.status === 'success') {
+                    loadChatHistory();
+                    $('#admin-chat-input').val('');
+                } else {
+                    alert('Failed to send message: ' + data.message);
+                }
+            });
+        }
+    });
+    {% endif %}
+
+    loadChatHistory();
+    setInterval(loadChatHistory, 5000); // Refresh chat every 5 seconds
+});
+
+
+
+</script>
+
+
 </body>
 </html>
